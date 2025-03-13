@@ -52,6 +52,8 @@ checkDomain2 (x:xs) ys c = do
 -- If output == "", then domain unchanged, and we can simply forget the constraint.
 -- Else, look through original set of constraints, and re-add all constraints for ys.
 
+
+-- TODO: 
 popX :: Eq a => a-> [a] -> (a, [a])
 popX _ [] = (undefined, [])
 popX x (y:ys) = if x == y then (y,ys) else let (a,b) = popX x ys in (a, y:b)
