@@ -70,8 +70,8 @@ iterateAC3 m@(AC3 fullCS _) ((x,y,c):cs) d = let
     yDomain = head [b | (a,b)<-d, y==a ]
     (newX, str) = runWriter $ checkDomain2 xDomain yDomain c
     -- In a lens, we could do this with "modify (\ (a,_) -> (a, newX))"
-    newDomains = (x, newX) : ((x, xDomain) `delete` d) 
-    z = if null str then cs else cs ++ [c' | c'@(y1,x1,_)<-fullCS, y1==y, x1==x ] -- take all constraints of the form (y,x, c) 
+    newDomains = (x, newX) : ((x, xDomain) `delete` d)
+    z = if null str then cs else cs ++ [c' | c'@(y1,x1,_)<-fullCS, y1==y, x1==x ] -- take all constraints of the form (y,x, c)
     in iterateAC3 m z newDomains 
 
 \end{code}
@@ -113,7 +113,7 @@ exampleAC3_bad = let
 -- NOT 1-colourable, as it has an edge.
 exampleAC3_triv :: AC3 Int Int 
 exampleAC3_triv = let 
-    nColours = 1 -- can only be 1-colourable iff cons = []. 
+    nColours = 1 -- can only be 1-colourable iff cons = [].
     nAgents = 5
     -- we assign a specific starting value to an (arbitrary) node.
     in AC3 ([ (a, (a+1) `mod` nAgents, (/=)) | a<-[0..nAgents-1]]) 
@@ -134,5 +134,12 @@ exampleAC3_GFG = let
     in AC3 (bCons ++ reverseCons bCons ++ 
                 outsideCons ++ reverseCons outsideCons) 
            ( ("B", [0]) : [ (a, [0..nColours-1]) | a <- agents])
+
+-- A problem that should have no solutions
+exampleAC3_no_solution :: AC3 Int Int 
+exampleAC3_no_solution = let
+    domains_no_sol = [(0, [1,2]), (1, [1,2]), (2, [1,2])]
+    constraints_no_sol = [(0, 1, (/=)), (1, 2, (/=)), (0,2, (/=))]
+    in AC3 constraints_no_sol domains_no_sol
 
 \end{code}
