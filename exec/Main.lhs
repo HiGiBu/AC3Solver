@@ -7,6 +7,10 @@ We will now use the library form Section \ref{sec:Basics} in a program.
 module Main where
 
 import Basics
+import GraphCol
+import Knapsack
+import Scheduling
+import Sudoku
 
 main :: IO ()
 main = do
@@ -17,6 +21,11 @@ main = do
   print myrandomnumbers
   print (map funnyfunction myrandomnumbers)
   putStrLn "GoodBye"
+
+  -- TODO: Get choice
+  -- choice = undefined 
+  -- TODO: Based on choice -> choose the right one.
+
 \end{code}
 
 We can run this program with the commands:
