@@ -12,9 +12,6 @@ module AC3_Mess where
 import Control.Monad.Writer
     ( runWriter, MonadWriter(tell), Writer )
 
-import Data.List
-    ( delete )
-
 data AC3 a b = AC3 { 
         -- Constraint should take values from the first & second agents as params x & y resp. in \x,y-> x ?=? y. 
         -- We should allow for multiple constraints for (X,Y), eg. both (x > y) AND (x < y) in the set. 
@@ -52,11 +49,41 @@ checkDomain2 (x:xs) ys c = do
 -- If output == "", then domain unchanged, and we can simply forget the constraint.
 -- Else, look through original set of constraints, and re-add all constraints for ys.
 
+\end{code}
 
--- TODO: 
-popX :: Eq a => a-> [a] -> (a, [a])
-popX _ [] = (undefined, [])
-popX x (y:ys) = if x == y then (y,ys) else let (a,b) = popX x ys in (a, y:b)
+Each time we call iterate, we start of by looking for the domains of agents X & Y 
+for our constraint (X,Y). Once we find these, we are likely to replace the original
+domain for X with a reduced one. We use \verb:popXy: and \verb:popX: to find the domains
+for X & Y, and at the same time we also remove the \emph{old} domain for X. 
+    Using this is 1 walk through the list, and saves us 2 walks. (Separate lookup for y, and 
+    a walk to delete the old x.)
+Once we have checked the current constraint, we then add back the \emph{new} domain for X.
+
+\begin{code}
+
+-- PRE: x is an element of (a:as) 
+popX :: Eq a => Agent a -> [Domain a b] -> ([b], [Domain a b] )
+popX _ [] = undefined -- should not occur.
+popX x (a@(aA, aD):as) = if x == aA then (aD,as) else let (x', as') = popX x as in (x', a:as')
+
+-- PRE: x != y; x,y are elements of (a:as). 
+--      (else, this is not a binary constraint but a unary one.) 
+popXy :: Eq a => Agent a -> Agent a -> [Domain a b] -> ([b], [b], [Domain a b] )
+popXy _ _ [] = undefined -- should not occur.
+popXy x y (a@(aA, aD):as) 
+    | x == aA = let -- we want to REMOVE a from the list.
+        -- search through the rest of the list and return y's domain.
+        yDomain = head [b' | (a',b')<-as, y==a' ]
+        in (aD, yDomain, as)
+    | y == aA = let (retX, retAs) = popX x as in (retX, aD, a:retAs)
+    | otherwise = let (retX, retY, retAs) = popXy x y as in (retX, retY, a:retAs)
+
+
+\end{code}
+
+TODO
+
+\begin{code}
 
 ac3 :: (Ord a, Ord b) => AC3 a b -> [Domain a b] -- return a list of domains.
 ac3 m@(AC3 c d) = let 
@@ -66,11 +93,13 @@ ac3 m@(AC3 c d) = let
 iterateAC3 :: (Ord a, Ord b) => AC3 a b -> [ConstraintAA a b] -> [Domain a b] -> [Domain a b]
 iterateAC3 _ [] d = d
 iterateAC3 m@(AC3 fullCS _) ((x,y,c):cs) d = let 
-    xDomain = head [b | (a,b)<-d, x==a ]
-    yDomain = head [b | (a,b)<-d, y==a ]
+    (xDomain, yDomain, alteredD) = popXy x y d
+    --xDomain = head [b | (a,b)<-d, x==a ]
+    --yDomain = head [b | (a,b)<-d, y==a ]
     (newX, str) = runWriter $ checkDomain2 xDomain yDomain c
     -- In a lens, we could do this with "modify (\ (a,_) -> (a, newX))"
-    newDomains = (x, newX) : ((x, xDomain) `delete` d)
+    newDomains = (x, newX) : alteredD
+    --newDomains = (x, newX) : ((x, xDomain) `delete` d)
     z = if null str then cs else cs ++ [c' | c'@(y1,x1,_)<-fullCS, y1==y, x1==x ] -- take all constraints of the form (y,x, c)
     in iterateAC3 m z newDomains 
 
