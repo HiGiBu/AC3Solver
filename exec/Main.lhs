@@ -6,25 +6,50 @@ We will now use the library form Section \ref{sec:Basics} in a program.
 \begin{code}
 module Main where
 
+import Text.Read (readMaybe)
+
 import Basics
 import GraphCol
 import Knapsack
 import Scheduling
 import Sudoku
+import NQueens
+
+getChoice :: IO Int
+getChoice = do 
+  putStr "Choose one of the following options: \n\
+         \1: Graph Colouring \n\
+         \2: N-Queens \n\
+         \3: Scheduling \n\
+         \4: Sudoku \n"
+  choice <- getLine 
+  case readMaybe choice of 
+    Nothing -> do
+      putStrLn "Invalid choice, please try again."
+      getChoice
+    Just n -> 
+      if n > 0 && n < 5 then return n else do 
+        putStrLn "Invalid choice, please try again."
+        getChoice
 
 main :: IO ()
 main = do
   putStrLn "Hello!"
-  print somenumbers
-  print (map funnyfunction somenumbers)
-  myrandomnumbers <- randomnumbers
-  print myrandomnumbers
-  print (map funnyfunction myrandomnumbers)
-  putStrLn "GoodBye"
+  --print somenumbers
+  --print (map funnyfunction somenumbers)
+  --myrandomnumbers <- randomnumbers
+  --print myrandomnumbers
+  --print (map funnyfunction myrandomnumbers)
+  --putStrLn "GoodBye"
 
-  -- TODO: Get choice
-  -- choice = undefined 
-  -- TODO: Based on choice -> choose the right one.
+  -- Get choice
+  choice <- getChoice
+  case choice of 
+    1 -> graphColMain
+    2 -> nQueensMain
+    3 -> schedulingMain
+    4 -> sudokuMain
+    _ -> undefined
 
 \end{code}
 
