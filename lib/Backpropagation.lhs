@@ -10,7 +10,7 @@ To test this, using the examples from AC3\_Mess:
 \begin{code}
 module Backpropagation where
 
-import AC3_Mess
+import AC3Solver
 
 type Assignment a b = (Agent a, b)
 
