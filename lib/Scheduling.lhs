@@ -5,7 +5,7 @@ import Text.Parsec
 import Text.Parsec.String
 import Control.Monad (replicateM)
 import Data.List (elemIndex)
-import AC3_Mess
+import AC3Solver
 
 type ClassAssignment = (Int, Int, Int)
 
@@ -58,13 +58,13 @@ checkAfter (x,x2,_) (y,y2,_) = x == y && x2 == y2 + 1
 
 getConstraint :: [String] -> IO (Maybe [ConstraintAA Int ClassAssignment])
 getConstraint classNames = do
-  putStrLn "Enter a constraint (e.g., 'class1 is before class2' or 'class1 is the same day class2'). Type 'Done' to finish:"
+  putStrLn "Enter a constraint (e.g., 'class1 is before class2' or 'class1 is the same day as class2'). Type 'Done' to finish:"
   input <- getLine
   if input == "Done" then return Nothing else do
     let parts = words input
     case parts of
       [class1, "is", "before", class2] -> Just <$> processClasses class1 class2 "is before" classNames
-      [class1, "is", "the", "same", "day", class2] -> Just <$> processClasses class1 class2 "is the same day" classNames
+      [class1, "is", "the", "same", "day", "as", class2] -> Just <$> processClasses class1 class2 "is the same day as" classNames
       _ -> do
         putStrLn "Invalid input format."
         getConstraint classNames
@@ -74,7 +74,7 @@ processClasses class1 class2 keyword classNames = do
   case (elemIndex class1 classNames, elemIndex class2 classNames) of
     (Just i, Just j) -> case keyword of
       "is before" -> return [(i, j, checkBefore), (j, i, checkAfter)]
-      "is the same day"  -> return [(i, j, checkSameDay), (j, i, checkSameDay)]
+      "is the same day as"  -> return [(i, j, checkSameDay), (j, i, checkSameDay)]
       _           -> error "Invalid keyword"
     _ -> error "Invalid class names"
 
@@ -88,6 +88,18 @@ collectConstraints classNames = do
   loop []
 
 schedulingMain :: IO ()
-schedulingMain = testUserInputs
+schedulingMain = do
+  (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames) <- getUserInputs
+  constraints <- collectConstraints classNames
+  
+  let uniquenessConstraints = [(i, j, (/=)) | i <- [0..numClasses-1], j <- [0..numClasses-1], i /= j]
+  let allConstraints = constraints ++ uniquenessConstraints
+  let classDomains = [(i, [(d, r, t) | d <- [0..5], t <- [0..numTimeSlots-1], r <- [0..numRooms-1]]) | i <- [0..numClasses-1]]
+  let ac3Inst = AC3 { cons = allConstraints, domains = classDomains }
+
+  let solutions = ac3 ac3Inst
+
+  putStrLn "\nPossible Solutions:"
+  print solutions
 
 \end{code}
