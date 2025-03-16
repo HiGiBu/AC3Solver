@@ -8,6 +8,8 @@ import Data.List (elemIndex)
 import AC3Solver
 
 type ClassAssignment = (Int, Int, Int)
+dayNames :: [String]
+dayNames = ["monday", "tuesday", "wednesday", "thursday", "friday"]
 
 parseInt :: Parser Int
 parseInt = do
@@ -56,6 +58,19 @@ checkBefore (x,x2,_) (y,y2,_) = x == y && x2 + 1 == y2
 checkAfter :: ClassAssignment -> ClassAssignment -> Bool
 checkAfter (x,x2,_) (y,y2,_) = x == y && x2 == y2 + 1
 
+checkDay :: Int -> ClassAssignment -> Bool
+checkDay a (x,_,_) = x == a
+
+checkTime :: Int -> ClassAssignment -> Bool
+checkTime a (_,x,_) = x == a
+
+checkRoom :: Int -> ClassAssignment -> Bool
+checkRoom a (_,_,x) = x == a
+
+filterDomains :: [Domain Int ClassAssignment] -> [(Agent Int, ClassAssignment -> Bool)] -> [Domain Int ClassAssignment]
+filterDomains domainList conditions =
+    [(agent, [v | v <- values, all (\(a, f) -> (a /= agent) || f v) conditions]) | (agent, values) <- domainList]
+
 getConstraint :: [String] -> IO (Maybe [ConstraintAA Int ClassAssignment])
 getConstraint classNames = do
   putStrLn "Enter a constraint (e.g., 'class1 is before class2' or 'class1 is the same day as class2'). Type 'Done' to finish:"
@@ -63,14 +78,14 @@ getConstraint classNames = do
   if input == "Done" then return Nothing else do
     let parts = words input
     case parts of
-      [class1, "is", "before", class2] -> Just <$> processClasses class1 class2 "is before" classNames
-      [class1, "is", "the", "same", "day", "as", class2] -> Just <$> processClasses class1 class2 "is the same day as" classNames
+      [class1, "is", "before", class2] -> Just <$> processConstraints class1 class2 "is before" classNames
+      [class1, "is", "the", "same", "day", "as", class2] -> Just <$> processConstraints class1 class2 "is the same day as" classNames
       _ -> do
-        putStrLn "Invalid input format."
+        putStrLn "Invalid input format"
         getConstraint classNames
 
-processClasses :: String -> String -> String -> [String] -> IO [ConstraintAA Int ClassAssignment]
-processClasses class1 class2 keyword classNames = do
+processConstraints :: String -> String -> String -> [String] -> IO [ConstraintAA Int ClassAssignment]
+processConstraints class1 class2 keyword classNames = do
   case (elemIndex class1 classNames, elemIndex class2 classNames) of
     (Just i, Just j) -> case keyword of
       "is before" -> return [(i, j, checkBefore), (j, i, checkAfter)]
@@ -87,6 +102,39 @@ collectConstraints classNames = do
           Just cs  -> loop (cs ++ acc)
   loop []
 
+getStartingValues :: [String] -> [String] -> [String] -> IO (Maybe (Agent Int, ClassAssignment -> Bool))
+getStartingValues classNames roomNames timeslotNames = do
+  putStrLn "Enter known values (e.g., 'class1 is in room3', 'class1 is at 11am' or 'class1 is on monday'). Type 'Done' to finish:"
+  input <- getLine
+  if input == "Done" then return Nothing else do
+    let parts = words input
+    case parts of
+      [class1, "is", "in", room] -> Just <$> processStartingValues class1 room "is in" classNames roomNames
+      [class1, "is", "at", time] -> Just <$> processStartingValues class1 time "is at" classNames timeslotNames
+      [class1, "is", "on", day] -> Just <$> processStartingValues class1 day "is on" classNames dayNames
+      _ -> do
+        putStrLn "Invalid input format"
+        getStartingValues classNames roomNames timeslotNames
+
+processStartingValues :: String -> String -> String -> [String] -> [String] -> IO (Agent Int, ClassAssignment -> Bool)
+processStartingValues class1 value keyword classNames valueNames = do
+  case (elemIndex class1 classNames, elemIndex value valueNames) of
+    (Just i, Just j) -> case keyword of
+      "is in" -> return (i, checkRoom j)
+      "is at" -> return (i, checkTime j)
+      "is on" -> return (i, checkDay j)
+      _           -> error "Invalid keyword"
+    _ -> error "Invalid class names"
+
+collectStartingValues :: [String] -> [String] -> [String] -> IO [(Agent Int, ClassAssignment -> Bool)]
+collectStartingValues classNames roomNames timeslotNames = do
+  let loop acc = do
+        value <- getStartingValues classNames roomNames timeslotNames
+        case value of
+          Nothing -> return acc
+          Just svs  -> loop (svs : acc)
+  loop []
+
 schedulingMain :: IO ()
 schedulingMain = do
   (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames) <- getUserInputs
@@ -94,8 +142,11 @@ schedulingMain = do
   
   let uniquenessConstraints = [(i, j, (/=)) | i <- [0..numClasses-1], j <- [0..numClasses-1], i /= j]
   let allConstraints = constraints ++ uniquenessConstraints
-  let classDomains = [(i, [(d, r, t) | d <- [0..5], t <- [0..numTimeSlots-1], r <- [0..numRooms-1]]) | i <- [0..numClasses-1]]
-  let ac3Inst = AC3 { cons = allConstraints, domains = classDomains }
+  let classDomains = [(i, [(d, t, r) | d <- [0..5], t <- [0..numTimeSlots-1], r <- [0..numRooms-1]]) | i <- [0..numClasses-1]]
+  domainConditions <- collectStartingValues classNames roomNames timeSlotNames
+  let filteredDomains = filterDomains classDomains domainConditions
+
+  let ac3Inst = AC3 { cons = allConstraints, domains = filteredDomains }
 
   let solutions = ac3 ac3Inst
 
