@@ -6,6 +6,7 @@ import Text.Parsec.String
 import Control.Monad (replicateM)
 import Data.List (elemIndex)
 import AC3Solver
+import Backtracking (findSolution)
 
 type ClassAssignment = (Int, Int, Int)
 dayNames :: [String]
@@ -124,7 +125,7 @@ processStartingValues class1 value keyword classNames valueNames = do
       "is at" -> return (i, checkTime j)
       "is on" -> return (i, checkDay j)
       _           -> error "Invalid keyword"
-    _ -> error "Invalid class names"
+    _ -> error "Invalid name"
 
 collectStartingValues :: [String] -> [String] -> [String] -> IO [(Agent Int, ClassAssignment -> Bool)]
 collectStartingValues classNames roomNames timeslotNames = do
@@ -134,6 +135,12 @@ collectStartingValues classNames roomNames timeslotNames = do
           Nothing -> return acc
           Just svs  -> loop (svs : acc)
   loop []
+
+printSolution :: [String] -> [String] -> [String] -> [String] -> [(Agent Int, ClassAssignment)] -> IO ()
+printSolution classNames days roomNames timeSlotNames list = putStrLn $ concat
+  [classNames !! agent ++ " is scheduled on " ++ days !! dayId ++
+    " in " ++ roomNames !! roomId ++ " at " ++ timeSlotNames !! timeId ++ ".\n"
+  | (agent, (dayId, roomId, timeId)) <- list]
 
 schedulingMain :: IO ()
 schedulingMain = do
@@ -146,11 +153,12 @@ schedulingMain = do
   domainConditions <- collectStartingValues classNames roomNames timeSlotNames
   let filteredDomains = filterDomains classDomains domainConditions
 
-  let ac3Inst = AC3 { cons = allConstraints, domains = filteredDomains }
+  let possibleSolutions = ac3 AC3 { cons = allConstraints, domains = filteredDomains }
 
-  let solutions = ac3 ac3Inst
+  let solution = findSolution AC3 { cons = allConstraints, domains = possibleSolutions }
 
-  putStrLn "\nPossible Solutions:"
-  print solutions
+  case solution of
+    Nothing -> putStrLn "No solution found."
+    Just sol -> printSolution classNames dayNames roomNames timeSlotNames sol
 
 \end{code}
