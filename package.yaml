@@ -45,3 +45,11 @@ tests:
       - report
       - QuickCheck
       - hspec
+
+  graphColTests:
+    main: graphColTests.lhs
+    source-dirs: test
+    dependencies:
+      - report
+      - QuickCheck
+      - hspec
