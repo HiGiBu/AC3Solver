@@ -2,7 +2,7 @@
 module NQueens where
 
 import AC3Solver ( ac3, AC3(AC3) )  -- Import AC3 solver
-import Backpropagation (findSolution, findAllSolutions ) -- Import backtracking solver
+import Backtracking (findSolution, findAllSolutions ) -- Import backtracking solver
 
 notSameQueenMove :: (Int, Int) -> (Int, Int) -> Bool
 notSameQueenMove (a1, a2) (b1, b2) =
@@ -51,6 +51,7 @@ nQueensMain = do
     if null solutions
     then putStrLn "No solution found."
     else do
-        putStrLn $ "Found " ++ show (length solutions) ++ " solution(s):"
+        putStrLn "Solutions: "
         mapM_ (prettyPrintBoard n) solutions
+        putStrLn $ "Found " ++ show (length solutions) ++ " solution(s)"
 \end{code}
