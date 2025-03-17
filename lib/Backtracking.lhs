@@ -1,5 +1,5 @@
 
-\section{The BackProp library}\label{sec:BackProp}
+\section{The Backtracking library}\label{sec:BackTrack}
 
 This section describes a module which we will import later on.
 
@@ -60,5 +60,9 @@ valY :: Eq a => Agent a -> [Assignment a b] -> b
 valY _ [] = undefined -- should not happen.
 valY y ((x,b):as) = if x == y then b else valY y as
 
+
+--Returns true iff at least 1 agent has an empty domain.
+determineNoSol :: [Domain a b] -> Bool 
+determineNoSol = any (\(_,ds) -> null ds) 
 
 \end{code}
