@@ -26,7 +26,6 @@ instance Arbitrary GraphCol where
         arbitGraphColN n = do 
             nColours <- choose (0, n `div` 2)
             sizeV <- choose (0, n) -- we make vertices 0..sizeV INCLUDING SIZEV!!
-            let v = [0..sizeV] -- create vertices 0..x INCLUDING SIZEV
             sizeE <- choose (0,n)
             e <- sequence [seqPair (choose (0, sizeV), choose (0, sizeV)) | _<-[0..sizeE]]
             let g = buildG (0, sizeV) e
