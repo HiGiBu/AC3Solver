@@ -17,6 +17,7 @@ dependencies:
   - parsec
   - random
   - template-haskell
+  - graphite
 
 library:
   source-dirs: lib
@@ -31,6 +32,14 @@ executables:
 tests:
   simpletests:
     main: simpletests.lhs
+    source-dirs: test
+    dependencies:
+      - report
+      - QuickCheck
+      - hspec
+
+  ac3Tests:
+    main: ac3Tests.lhs
     source-dirs: test
     dependencies:
       - report

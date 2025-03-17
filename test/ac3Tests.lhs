@@ -3,7 +3,9 @@
 module Main where 
 
 import AC3Solver
+import Backtracking
 
+import Data.Maybe
 import Test.Hspec
 import Test.QuickCheck
 
@@ -12,6 +14,32 @@ main = hspec $ do
   describe "AC3 Tests" $ do
     it "Example test" $ 
       ac3 exampleAC3 `shouldBe` [(4,[1,2]),(3,[0,1,2]),(2,[0,1,2]),(1,[0,1,2]),(0,[0])]
+    it "Positive example (each agent has non-empty domain) - 1" $ 
+      ac3 exampleAC3 `shouldNotSatisfy` determineNoSol
+    it "Positive example (each agent has non-empty domain) - 2" $ 
+      ac3 exampleAC3_2 `shouldNotSatisfy` determineNoSol
+    it "Positive example (each agent has non-empty domain) - 3" $ 
+      ac3 exampleAC3_GFG `shouldNotSatisfy` determineNoSol
+
+    it "Positive example (at least 1 actual solution) - 1" $ do
+      let newD = ac3 exampleAC3
+      findSolution (AC3 (cons exampleAC3) newD) `shouldSatisfy` isJust
+    it "Positive example (at least 1 actual solution) - 2" $ do
+      let newD = ac3 exampleAC3_2
+      findSolution (AC3 (cons exampleAC3_2) newD) `shouldSatisfy` isJust
+    it "Positive example (at least 1 actual solution) - 3" $ do
+      let newD = ac3 exampleAC3_GFG
+      findSolution (AC3 (cons exampleAC3_GFG) newD) `shouldSatisfy` isJust
+    
+    it "Negative example (has no solution) - 1" $ do
+      let newD = ac3 exampleAC3_bad
+      findSolution (AC3 (cons exampleAC3_bad) newD) `shouldBe` Nothing
+    it "Negative example (has no solution) - 2" $ do
+      let newD = ac3 exampleAC3_triv
+      findSolution (AC3 (cons exampleAC3_triv) newD) `shouldBe` Nothing
+    it "Negative example (has no solution) - 3" $ do
+      let newD = ac3 exampleAC3_no_solution
+      findSolution (AC3 (cons exampleAC3_no_solution) newD) `shouldBe` Nothing
 
 \end{code}
 
