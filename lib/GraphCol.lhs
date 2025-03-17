@@ -25,12 +25,23 @@ instance Arbitrary GraphCol where
     arbitrary = sized arbitGraphColN where 
         arbitGraphColN n = do 
             nColours <- choose (0, n `div` 2)
-            sizeV <- choose (0, n)
-            let v = [0..sizeV-1] -- create vertices 0..x
+            sizeV <- choose (0, n) -- we make vertices 0..sizeV INCLUDING SIZEV!!
+            let v = [0..sizeV] -- create vertices 0..x INCLUDING SIZEV
             sizeE <- choose (0,n)
             e <- sequence [seqPair (choose (0, sizeV), choose (0, sizeV)) | _<-[0..sizeE]]
-            let g = buildG (0, foldr max 0 v) e
+            let g = buildG (0, sizeV) e
             return $ convertGraphToAC3 g nColours --return $ convertGraphToAC3 g n
+
+instance Show GraphCol where 
+  --show :: GraphCol -> String 
+  show (GC (AC3 c d)) = let 
+    strCon = "[" ++ makeShow c ++ "]" where 
+      makeShow [] = ""
+      makeShow ((x,y,_):cs) = 
+        "(" ++ show x ++ ", " ++ show y ++ ", (/=))" 
+        ++ if not $ null cs then ", " ++ makeShow cs else "" 
+    strD = show d
+    in "GC (AC3 " ++ strCon ++ " " ++ strD ++ " )" 
 
 \end{code}
 
