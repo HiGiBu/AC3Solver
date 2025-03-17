@@ -40,6 +40,18 @@ main = hspec $ do
     it "Negative example (has no solution) - 3" $ do
       let newD = ac3 exampleAC3_no_solution
       findSolution (AC3 (cons exampleAC3_no_solution) newD) `shouldBe` Nothing
+    
+    -- The --coverage says these cases are never reached, but that is simply not true lol.
+    --  It says this even with these cases, but that notwithstanding: according to the test report,
+    --  we always get the otherwise case, which would seemingly point to us eventually reaching the 
+    --      [] = undefined case     ¯\_(ツ)_/¯
+    let xAgent = ("x", [1 :: Int])
+    let yAgent = ("y", [2])
+    let d = [xAgent, yAgent]
+    it "Test popXy x==a" $ do
+      popXy "x" "y" d `shouldBe` ([1], [2], [yAgent])
+    it "Test popXy y==a" $ do
+      popXy "x" "y" d `shouldBe` ([1], [2], [xAgent])
 
 \end{code}
 
