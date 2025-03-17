@@ -51,7 +51,7 @@ main = hspec $ do
     it "Test popXy x==a" $ do
       popXy "x" "y" d `shouldBe` ([1], [2], [yAgent])
     it "Test popXy y==a" $ do
-      popXy "x" "y" d `shouldBe` ([1], [2], [xAgent])
+      popXy "y" "x" d `shouldBe` ([2], [1], [xAgent])
 
 \end{code}
 
