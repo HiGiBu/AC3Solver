@@ -3,8 +3,8 @@
 \begin{code}
 module NQueens where
 
-import AC3Solver ( ac3, AC3(AC3) )  -- Import AC3 solver
-import Backtracking (findSolution, findAllSolutions ) -- Import backtracking solver
+import AC3Solver ( ac3, AC3(AC3) )  -- import AC3 solver
+import Backtracking (findSolution, findAllSolutions ) -- import backtracking solver
 
 notSameQueenMove :: (Int, Int) -> (Int, Int) -> Bool
 notSameQueenMove (a1, a2) (b1, b2) =
@@ -26,7 +26,7 @@ solveNQueens n = findSolution (AC3 constraints (ac3 (nQueens n)))
   where
     AC3 constraints _ = nQueens n
 
--- Find all solutions
+-- find all solutions
 solveAllNQueens :: Int -> [[(Int, (Int, Int))]]
 solveAllNQueens n = findAllSolutions (AC3 constraints (ac3 (nQueens n)))
   where
@@ -49,11 +49,13 @@ nQueensMain = do
     putStrLn "Enter board size (N):"
     n <- readLn
     let solutions = solveAllNQueens n
-    --let solutions = solveNQueens n --uncomment for 1 solution instead
+    -- uncomment for 1 solution instead
+    -- let solutions = solveNQueens n
     if null solutions
     then putStrLn "No solution found."
     else do
         putStrLn "Solutions: "
-        mapM_ (prettyPrintBoard n) solutions
+        -- comment out if only interested in the number of solutions
+        -- mapM_ (prettyPrintBoard n) solutions
         putStrLn $ "Found " ++ show (length solutions) ++ " solution(s)"
 \end{code}
