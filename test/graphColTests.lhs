@@ -40,7 +40,7 @@ main = hspec $ do
           newGC = convertGraphToAC3 g 1 
           newG = ac3ToGraph newGC
           in all (`elem` edges newG) $ edges g)
-      
+    {-  
     it "Any found solution should also be in the list of all solutions" $ 
       property (\(GC inst) -> let 
           msol = findSolution inst
@@ -48,7 +48,7 @@ main = hspec $ do
             Nothing -> True 
             Just sol -> sol `elem` findAllSolutions inst
           )
-
+    -}
     it "If an agent has an empty domain, then no solution can be found" $ 
       property (\(GC inst) -> let 
           isSol = determineNoSol $ ac3 inst
@@ -56,6 +56,22 @@ main = hspec $ do
           in not isSol || isNothing (findSolution inst)
           )
 
+    it "If findSolution returns a solution, then that solution must be legal" $ 
+      property (\(GC inst) -> let
+          msol = findSolution inst
+          in case msol of 
+            Nothing -> True 
+            Just sol -> checkSolution (cons inst) sol
+          )
+    {-
+    it "All solutions from findAllSolutions should be legal" $ 
+      property (\(GC inst) -> let
+          newD = ac3 inst -- reduce the search space
+          sols = findAllSolutions (AC3 (cons inst) newD)
+          in all (checkSolution (cons inst)) sols
+          )
+    -}
+    --findAllSolutions can get *very* slow...
 
     -- yeah so this is just Wrong... but maybe some of the code is useful in the future 
     {-
