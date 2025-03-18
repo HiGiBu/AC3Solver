@@ -15,7 +15,10 @@ import Control.Monad.Writer
 To start of, we define the \verb:AC3: instance. For each agent, we have a set of agents of type \verb:a:.
 An \verb:AC3: instance then constains a list of constraints \verb:constraintAA:, and a list of domains. 
 Each \verb:constraintAA: contains a pair of agents (X,Y), and then a function, such as \verb:(==):, 
-    which is the constraint on the arc from X to Y. 
+which is the constraint on the arc from X to Y.
+    \footnote{Note that we only allow for \emph{binary} constraints. 
+    The AC-3 algorithm does not allow for ternary (or greater) constraints, and unary constraints can be resolved 
+    by restricting that agent's domain. \cite{AC3} provides other approaches for achieving path consistency, where you may have ternary (or greater) constraints.}
 Each \verb:Domain: item contains an agent, and then a list of values of type \verb:b:. 
 
 We may have multiple constraints for a pair of agents (X,Y), such as both \verb:(>): and \verb:(>=):. 
