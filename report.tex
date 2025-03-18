@@ -1,10 +1,10 @@
 \documentclass[12pt,a4paper]{article}
 \input{latexmacros.tex}
 
-\title{My Report}
-\author{Me}
+\title{Using AC-3 to come up with a good title}
+\author{David Hildering \and Dennis Lindberg \and Joel Maxson \and Helen Sand \and Andy S. Tatman}
 \date{\today}
-\hypersetup{pdfauthor={Me}, pdftitle={My Report}}
+\hypersetup{pdfauthor={David Hildering \and Dennis Lindberg \and Joel Maxson \and Helen Sand \and Andy S. Tatman}, pdftitle={Using AC-3 to come up with a good title}}
 
 \begin{document}
 
@@ -26,11 +26,22 @@ We use the listings package to typeset Haskell source code nicely.
 % We include one file for each section. The ones containing code should
 % be called something.lhs and also mentioned in the .cabal file.
 
-\input{Howto.tex}
+% \input{Howto.tex}
 
-\section{The library files}
+\section{Introduction}
+TODO: What is AC-3, why use it (etc)...
+
+AC-3 paper: \cite{AC3}
+
+
+\section{The skeleton files}
+These files form the basis of our implementation, which we then use to solve various problems.
 
 \input{lib/AC3Solver.lhs}
+
+\input{lib/Backtracking.lhs}
+
+\section{The problem files} % TODO: Maybe a better name for this?
 
 \input{lib/NQueens.lhs}
 

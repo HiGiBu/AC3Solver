@@ -1,6 +1,12 @@
 \subsection{The Graph Colouring library}\label{sec:GraphCol}
 
+Graph colouring is a well-known NP-Complete problem~\cite{GraphColRef}. 
+Its nature as a graph problem lends it well to being modelled as an \verb:AC3: instance,
+ and then being solved using our backtracking functions.
 
+A problem instance consists of an undirected graph, and an integer $n > 0$. 
+We are asked to assign a colour $0..(n-1)$ to each vertex, where for each edge $(u,v)$, 
+$u$ and $v$ have different colours. 
 
 \begin{code}
 --{-# LANGUAGE LambdaCase #-} -- todo remove? if not using data.graph.read...
@@ -17,6 +23,20 @@ import Test.QuickCheck
 import AC3Solver
 import Backtracking
 import Scheduling (parseInput)
+
+\end{code}
+
+We make use of Haskell's Graph library, following in its convention that vertices are 
+numbers, and edges are pairs of vertices. 
+
+We define a newtype \verb:GraphCol: using \verb:AC3:, where the agents are of type \verb:Vertex: 
+and the domain is a set of colours $\subseteq$ \verb:[0..(n-1)]:.
+All constraints should be of the form \verb:(X,Y,(/=)):, and this represents an edge \verb:(X,Y):
+in the graph. 
+
+We define arbitrary instances for \verb:GraphCol: using following these conventions.
+
+\begin{code}
 
 -- We define a newtype, so that we can generate arbitrary instances.
 newtype GraphCol = GC (AC3 Vertex Int)

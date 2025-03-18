@@ -1,6 +1,7 @@
-\section{The AC3Solver library}\label{sec:Solver}
+\subsection{The AC3Solver library}\label{sec:Solver}
 
-This section describes a module which we will import later on.
+% This section describes a module which we will import later on.
+This module contains the main algorithm and definition for our project, the \verb:AC3: type.
 
 \begin{code}
 module AC3Solver where
@@ -11,15 +12,17 @@ import Control.Monad.Writer
 
 \end{code}
 
-To start of, we define the AC3 instance. For each agent, we have a set of agents of type \verb:a:.
-An AC3 instance then constains a list of constraints \verb:constraintAA:, and a list of domains. 
+To start of, we define the \verb:AC3: instance. For each agent, we have a set of agents of type \verb:a:.
+An \verb:AC3: instance then constains a list of constraints \verb:constraintAA:, and a list of domains. 
 Each \verb:constraintAA: contains a pair of agents (X,Y), and then a function, such as \verb:(==):, 
     which is the constraint on the arc from X to Y. 
 Each \verb:Domain: item contains an agent, and then a list of values of type \verb:b:. 
 
-We may have multiple constraints for a pair of agentsd (X,Y), such as both \verb:(>): and \verb:(>=):. 
-The programme however expects that each agent has exactly 1 domain specified for it, and 
-each constraint (X,Y) should have some (possibly empty) domain assigned to it.
+We may have multiple constraints for a pair of agents (X,Y), such as both \verb:(>): and \verb:(>=):. 
+The programme however expects that each agent mentioned in a constraint has exactly 1 (possibly empty) domain specified for it.
+
+Note that we do not define an arbitrary instance for AC3. Instead, we define arbitrary instances 
+for specific problems. (See for example Section~\ref{sec:GraphCol}.)
 
 \begin{code}
 
@@ -52,7 +55,7 @@ checkDomain [] _ _ = return []
 checkDomain (x:xs) ys c = do 
     rest <- checkDomain xs ys c  
     if not $ null [ y' | y'<-ys, c x y'] then return $ x:rest
-    else tell "Altered domain" >> return rest -- This is nicely formatted for readability, it could just be "." or whatever.
+    else tell "Altered domain" >> return rest -- This is nicely formatted for readability, it could just be something simple such as ".".
 
 \end{code}
 
@@ -69,16 +72,17 @@ Each time we call iterate, we start of by looking for the domains of agents X \&
 for our constraint (X,Y). Once we find these, we are likely to replace the original
 domain for X with a reduced one. We use \verb:popXy: and \verb:popX: to find the domains
 for X \& Y, and at the same time we also remove the \emph{old} domain for X. 
-    Using this is 1 walk through the list, and saves us 2 walks. (Separate lookup for y, and 
-    a walk to delete the old x.)
-Once we have checked the current constraint, we then add back the \emph{new} domain for X.
+    Using \verb:popXy:, we do 1 walk through the list, and save us 2 walks compared to doing a separate lookup for y, and 
+    a separate walk to delete the old x. 
+% Once we have checked the current constraint, we then add back the \emph{new} domain for X.
 
 \begin{code}
 
 -- PRE: x is an element of (a:as) 
 popX :: Eq a => Agent a -> [Domain a b] -> ([b], [Domain a b] )
 popX _ [] = undefined -- should not occur.
-popX x (a@(aA, aD):as) = if x == aA then (aD,as) else let (x', as') = popX x as in (x', a:as')
+popX x (a@(aA, aD):as) = if x == aA then (aD,as) 
+                         else let (x', as') = popX x as in (x', a:as')
 
 -- PRE: x != y; x,y are elements of (a:as). 
 --      (else, this is not a binary constraint but a unary one.) 
@@ -106,17 +110,19 @@ If X's domain was altered, then we add all constraints of the form (Y,X) to the 
 
 ac3 :: (Ord a, Ord b) => AC3 a b -> [Domain a b] -- return a list of domains.
 ac3 m@(AC3 c d) = let 
-    queue = c -- put each constraint into the queue.  -- TODO: implement this better, eg a priority queue?
+    queue = c -- put each constraint into the queue.  -- TODO: implement this better, eg a proper queue?
     in iterateAC3 m queue d
 
-iterateAC3 :: (Ord a, Ord b) => AC3 a b -> [ConstraintAA a b] -> [Domain a b] -> [Domain a b]
+iterateAC3 :: (Ord a, Ord b) => AC3 a b -> [ConstraintAA a b] -> [Domain a b] 
+                -> [Domain a b]
 iterateAC3 _ [] d = d
 iterateAC3 m@(AC3 fullCS _) ((x,y,c):cs) d = let 
     (xDomain, yDomain, alteredD) = popXy x y d
     (newX, str) = runWriter $ checkDomain xDomain yDomain c
         -- In a lens, we could do this with "modify (\ (a,_) -> (a, newX))"
     newDomains = (x, newX) : alteredD
-    z = if null str then cs else cs ++ [c' | c'@(y1,x1,_)<-fullCS, y1==y, x1==x ] -- take all constraints of the form (y,x, c)
+    -- take all constraints of the form (y,x, c)
+    z = if null str then cs else cs ++ [c' | c'@(y1,x1,_)<-fullCS, y1==y, x1==x ] 
     in iterateAC3 m z newDomains 
 
 \end{code}
