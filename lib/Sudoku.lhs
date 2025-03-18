@@ -67,9 +67,9 @@ sudokuMain = do
 -- Display welcome banner
 showWelcomeMessage :: IO ()
 showWelcomeMessage = do
-    putStrLn "╔════════════════════════════════════════╗"
-    putStrLn "║           SUDOKU AC3 SOLVER            ║"
-    putStrLn "╚════════════════════════════════════════╝"
+    putStrLn "------------------------------------------" 
+    putStrLn "|           SUDOKU AC3 SOLVER            |"
+    putStrLn "------------------------------------------"
     putStrLn ""
 
 
