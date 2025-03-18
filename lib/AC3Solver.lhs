@@ -65,10 +65,10 @@ checkDomain (x:xs) ys c = do
 \end{code}
 }
 
-Each time we call iterate, we start of by looking for the domains of agents X & Y 
+Each time we call iterate, we start of by looking for the domains of agents X \& Y 
 for our constraint (X,Y). Once we find these, we are likely to replace the original
 domain for X with a reduced one. We use \verb:popXy: and \verb:popX: to find the domains
-for X & Y, and at the same time we also remove the \emph{old} domain for X. 
+for X \& Y, and at the same time we also remove the \emph{old} domain for X. 
     Using this is 1 walk through the list, and saves us 2 walks. (Separate lookup for y, and 
     a walk to delete the old x.)
 Once we have checked the current constraint, we then add back the \emph{new} domain for X.
@@ -97,7 +97,7 @@ popXy x y (a@(aA, aD):as)
 
 We now come to the main part of the algorithm. The iterateAC3 function runs as long as the 
     queue of constraints is not empty, starting with the original set of constraints. 
-We get the domains of X & Y, and remove the \emph{old} domains of X. 
+We get the domains of X \& Y, and remove the \emph{old} domains of X. 
 We then run checkDomain, and add the new domain of X back to the list of domains.
 If X's domain was altered, then we add all constraints of the form (Y,X) to the back of the queue.
 
