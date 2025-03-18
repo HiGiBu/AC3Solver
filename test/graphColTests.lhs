@@ -8,7 +8,7 @@ import GraphCol
 
 import Data.Graph
 import Data.List (sort)
---import Data.Maybe
+import Data.Maybe
 import Test.Hspec
 import Test.QuickCheck
 
@@ -40,6 +40,21 @@ main = hspec $ do
           newGC = convertGraphToAC3 g 1 
           newG = ac3ToGraph newGC
           in all (`elem` edges newG) $ edges g)
+      
+    it "Any found solution should also be in the list of all solutions" $ 
+      property (\(GC inst) -> let 
+          msol = findSolution inst
+          in case msol of 
+            Nothing -> True 
+            Just sol -> sol `elem` findAllSolutions inst
+          )
+
+    it "If an agent has an empty domain, then no solution can be found" $ 
+      property (\(GC inst) -> let 
+          isSol = determineNoSol $ ac3 inst
+          -- if there is defintely no solution, then findSol should indeed return Nothing.
+          in not isSol || isNothing (findSolution inst)
+          )
 
 
     -- yeah so this is just Wrong... but maybe some of the code is useful in the future 
