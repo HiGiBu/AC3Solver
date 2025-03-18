@@ -22,7 +22,7 @@ getChoice = do
          \1: Graph Colouring \n\
          \2: N-Queens \n\
          \3: Scheduling \n\
-         \4: Sudoku \n
+         \4: Sudoku \n\
          \5: Zebra Puzzle \n"
   choice <- getLine 
   case readMaybe choice of 
