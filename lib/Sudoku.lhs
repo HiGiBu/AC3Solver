@@ -102,8 +102,72 @@ sudokuExampleUnique = AC3 sudokuConstraints sudokuExampleDomainUnique
 
 \end{code}
 
-Here are some functions to visualize the initial board and what the board looks like after running AC3. Bear in mind that AC3 doesn't solve sudoku puzzles,
-but it severely reduces the domain of each cell. In some cases, it can partially start solving a puzzle by reducing the domain of some cells to a single value.
+Instead of specifying our own sudoku puzzles we can leverage a repository of sudoku puzzles. Below is the code
+needed to load sudoku puzzles.
+
+\begin{code}
+
+-- Read a Sudoku puzzle from a file
+readSudokuFromFile :: FilePath -> IO [Domain (Int, Int) Int]
+readSudokuFromFile filepath = do
+    contents <- readFile filepath
+    let rows = lines contents
+    return (parseSudokuDomains rows)
+
+
+-- Parse the file contents into domain representation
+parseSudokuDomains :: [String] -> [Domain (Int, Int) Int]
+parseSudokuDomains rows = cellDomains where
+    -- Convert characters to domain values
+    charToDomain :: Char -> [Int]
+    -- Dots represent empty cells, their domain contains all possible values
+    charToDomain '.' = [1..9]
+    -- Digits represent fixed cells, their domain contains only that value
+    charToDomain c = if c >= '1' && c <= '9' then [read [c]] else [1..9]
+    
+    -- Return a list of domains for each cell
+    cellDomains = [((i, j), charToDomain c) |
+                  (i, row) <- zip [1..9] (take 9 rows), -- rows :: [String] where each string is a row
+                  (j, c) <- zip [1..9] (take 9 row)]
+
+
+-- Create a AC3 formatted Sudoku puzzle from a file
+loadSudokuPuzzle :: String -> IO (AC3 (Int, Int) Int)
+loadSudokuPuzzle fileName = do
+    let filepath = "sudokuPuzzles/" ++ fileName ++ ".sud"
+    cellDomains <- readSudokuFromFile filepath
+    return (AC3 sudokuConstraints cellDomains)
+
+\end{code}
+
+Below are two functions that take a file (name) as input and does:
+- `solveSudokuFromFile`: loads a sudoku puzzle from a file, runs AC3, and prints the initial and final state of the puzzle.
+- `computeReductionFromFile`: loads a sudoku puzzle from a file, runs AC3, and computes the average domain size before and after running AC3.
+
+Note the input to both of the above should be a \textbf{file name}, which means one of the following:
+- "easy1", "easy2", ..., "easy50",
+- "hard1", "hard2", ..., "hard95",
+- "impossible", "Mirror", "Times1".
+
+\begin{code}
+-- Load, run AC3, and print a Sudoku puzzle
+solveSudokuFromFile :: String -> IO ()
+solveSudokuFromFile fileName = do
+    puzzle <- loadSudokuPuzzle fileName         
+    putStrLn "Initial puzzle:"
+    printSudokuPuzzle puzzle
+    putStrLn "\nAfter applying AC3:"
+    printSudokuSolution puzzle
+
+-- Compute the average domain size before and after running AC3
+computeReductionFromFile :: String -> IO (Float, Float)
+computeReductionFromFile fileName = do
+    puzzle <- loadSudokuPuzzle fileName
+    return (computeReduction puzzle)
+
+\end{code}
+
+The code above relied on some pretty-printing and reduction computation, which are defined below.
 
 \begin{code}
 
@@ -139,7 +203,6 @@ visualizeSudoku domains' = unlines (
 -- Function to print the initial state of a Sudoku puzzle
 printSudokuPuzzle :: AC3 (Int, Int) Int -> IO ()
 printSudokuPuzzle (AC3 _ domains') = do
-    putStrLn "Initial Sudoku puzzle:"
     putStrLn (visualizeSudoku domains')
 
 -- Function to run and print a Sudoku solution
@@ -149,8 +212,6 @@ printSudokuSolution puzzle = do
     putStrLn (visualizeSudoku solution)
 
 \end{code}
-
-
 
 \begin{code}
 
