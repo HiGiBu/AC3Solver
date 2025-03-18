@@ -1,3 +1,5 @@
+\subsection{The NQueens library}\label{sec:NQueens}
+
 \begin{code}
 module NQueens where
 
