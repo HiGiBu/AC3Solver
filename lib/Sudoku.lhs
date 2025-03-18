@@ -8,6 +8,74 @@ import AC3Solver ( AC3 (..), ac3, ConstraintAA, Domain )
 
 This file contains the implementation of Sudoku puzzles, printing Sudoku boards, and calling the AC3 solver on puzzles.
 
+The end result is a program that can do something like the following.
+
+\begin{code}
+
+sudokuMain :: IO ()
+sudokuMain = do
+    showWelcomeMessage
+
+    putStr "Choose your difficulty: \n\
+         \  (1) easy\n\
+         \  (2) hard\n\
+         \  (3) special\n"
+    
+    putStr "\nSelect one of (1, 2, 3): "
+    diff <- getLine
+
+    fileName <- case diff of
+        "1" -> do
+            putStr "Choose a puzzle number between 1 and 50: "
+            puzzleNum <- getLine
+            return ("easy" ++ puzzleNum)
+            
+        "2" -> do
+            putStr "Choose a puzzle number between 1 and 95: "
+            puzzleNum <- getLine
+            return ("hard" ++ puzzleNum)
+            
+        "3" -> do
+            putStr "Choose a puzzle: \n\
+                \  (1) impossible\n\
+                \  (2) Mirror\n\
+                \  (3) Times1\n"
+            putStr "\nYour choice: "
+            puzzleName <- getLine
+            return $ case puzzleName of
+                "1" -> "impossible"
+                "2" -> "Mirror"
+                "3" -> "Times1"
+                _   -> "impossible"
+                
+        _ -> do
+            putStrLn "Invalid choice. Please try again."
+            sudokuMain  -- Restart if invalid choice
+            return ""   -- This line is never reached but needed for type checking
+
+    -- Print the initial puzzle and the result after applying AC3
+    putStr $ "\nSolving Sudoku puzzle " ++ fileName ++ "...\n"
+
+    (beforeAC3, afterAC3) <- computeReductionFromFile fileName
+    putStrLn "The average domain size:"
+    putStrLn $ "    Before AC3: " ++ show beforeAC3
+    putStrLn $ "    After AC3: " ++ show afterAC3
+
+    -- Solve the Sudoku puzzle from the file
+    solveSudokuFromFile fileName
+    
+-- Display welcome banner
+showWelcomeMessage :: IO ()
+showWelcomeMessage = do
+    putStrLn "╔════════════════════════════════════════╗"
+    putStrLn "║           SUDOKU AC3 SOLVER            ║"
+    putStrLn "╚════════════════════════════════════════╝"
+    putStrLn ""
+
+
+\end{code}
+
+
 The constraints on any given cell are:
     1. it must contain a distinct number from other cells in the same row,
     2. it must contain a distinct number from other cells in the same column,
@@ -43,9 +111,9 @@ sudokuConstraints =    [(i, j, (/=)) | i <- allCells, j <- allCells, i /= j, i `
 sudokuDomains :: [Domain (Int, Int) Int]
 sudokuDomains = [(i, [1..9]) | i <- allCells]
 
--- An empty Sudoku puzzle (no cells filled in)
-sudokuMain :: AC3 (Int, Int) Int
-sudokuMain = AC3 sudokuConstraints sudokuDomains
+-- An empty Sudoku puzzle (no initial cells filled in)
+sudokuEmpty :: AC3 (Int, Int) Int
+sudokuEmpty = AC3 sudokuConstraints sudokuDomains
 
 \end{code}
 
