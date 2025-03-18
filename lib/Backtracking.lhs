@@ -87,6 +87,18 @@ helpFSAll constrs ((x, ds):dss) as = concatMap recurseFS ds where
                      && all (\(y, x', cf) -> not (x == x' && y `elemAs` as) || cf (valY y as) d) constrs
         in if checkCons then helpFSAll constrs dss ((x,d):as) else []
 
+\end{code}
+
+Given a solution, verify whether this solution is permissible with the provided constraints.
+
+\begin{code}
+
+checkSolution :: Eq a => [ConstraintAA a b] -> [Assignment a b] -> Bool 
+checkSolution [] _ = True 
+checkSolution ((x,y,f):cs) as = elemAs x as && elemAs y as && let   
+    xN = valY x as 
+    yN = valY y as
+    in f xN yN && checkSolution cs as
 
 \end{code}
 
