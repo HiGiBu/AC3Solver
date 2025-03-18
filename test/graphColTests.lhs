@@ -7,7 +7,8 @@ import Backtracking
 import GraphCol
 
 import Data.Graph
-import Data.Maybe
+import Data.List (sort)
+--import Data.Maybe
 import Test.Hspec
 import Test.QuickCheck
 
@@ -26,6 +27,20 @@ main = hspec $ do
       -- note: as we don't have Eq defined for a constraint (and can't, as it's a function), 
       --        we need to extract the pairs from the constraint. 
       property (\(GC inst) -> let g=ac3ToGraph (GC inst) in all (\(x,y) -> (x,y) `elem` [ (a,b) | (a,b,_)<-cons inst]) $ edges g) 
+
+    it "Running AC3 a second time does not change the actual output, only possibly the order." $ 
+      property (\(GC inst) -> let 
+        newD = ac3 inst
+        newD2 = ac3 $ AC3 (cons inst) newD
+        in sort newD == sort newD2)
+
+    it "Converting a graph to GraphCol and back should not lose edges" $ 
+      property (\gc -> let -- not ideal to have to use gc...
+          g = ac3ToGraph gc
+          newGC = convertGraphToAC3 g 1 
+          newG = ac3ToGraph newGC
+          in all (`elem` edges newG) $ edges g)
+
 
     -- yeah so this is just Wrong... but maybe some of the code is useful in the future 
     {-

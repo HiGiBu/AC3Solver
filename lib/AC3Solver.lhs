@@ -125,7 +125,7 @@ iterateAC3 m@(AC3 fullCS _) ((x,y,c):cs) d = let
         -- In a lens, we could do this with "modify (\ (a,_) -> (a, newX))"
     newDomains = (x, newX) : alteredD
     -- take all constraints of the form (y,x, c)
-    z = if null str then cs else cs ++ [c' | c'@(y1,x1,_)<-fullCS, y1==y, x1==x ] 
+    z = if null str then cs else cs ++ [c' | c'@(y1,x1,_)<-fullCS, y1/=y && y1/=x, x1==x ] 
     in iterateAC3 m z newDomains 
 
 \end{code}

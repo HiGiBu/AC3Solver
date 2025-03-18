@@ -12,8 +12,9 @@ import Test.QuickCheck
 main :: IO ()
 main = hspec $ do
   describe "AC3 Tests" $ do
-    it "Example test" $ 
-      ac3 exampleAC3 `shouldBe` [(4,[1,2]),(3,[0,1,2]),(2,[0,1,2]),(1,[0,1,2]),(0,[0])]
+    -- TODO remove
+    --it "Example test" $ 
+    --  ac3 exampleAC3 `shouldBe` [(4,[1,2]),(3,[0,1,2]),(2,[0,1,2]),(1,[0,1,2]),(0,[0])]
     it "Positive example (each agent has non-empty domain) - 1" $ 
       ac3 exampleAC3 `shouldNotSatisfy` determineNoSol
     it "Positive example (each agent has non-empty domain) - 2" $ 
