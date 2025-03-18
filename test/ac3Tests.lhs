@@ -44,7 +44,7 @@ main = hspec $ do
     -- The --coverage says these cases are never reached, but that is simply not true lol.
     --  It says this even with these cases, but that notwithstanding: according to the test report,
     --  we always get the otherwise case, which would seemingly point to us eventually reaching the 
-    --      [] = undefined case     ¯\_(ツ)_/¯
+    --      [] = undefined case
     let xAgent = ("x", [1 :: Int])
     let yAgent = ("y", [2])
     let d = [xAgent, yAgent]
