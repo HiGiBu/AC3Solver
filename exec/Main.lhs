@@ -14,6 +14,7 @@ import Knapsack
 import Scheduling
 import Sudoku
 import NQueens
+import ZebraPuzzle
 
 getChoice :: IO Int
 getChoice = do 
@@ -21,14 +22,15 @@ getChoice = do
          \1: Graph Colouring \n\
          \2: N-Queens \n\
          \3: Scheduling \n\
-         \4: Sudoku \n"
+         \4: Sudoku \n
+         \5: Zebra Puzzle \n"
   choice <- getLine 
   case readMaybe choice of 
     Nothing -> do
       putStrLn "Invalid choice, please try again."
       getChoice
     Just n -> 
-      if n > 0 && n < 5 then return n else do 
+      if n > 0 && n < 6 then return n else do 
         putStrLn "Invalid choice, please try again."
         getChoice
 
@@ -49,6 +51,7 @@ main = do
     2 -> nQueensMain
     3 -> schedulingMain
     4 -> sudokuMain
+    5 -> zebraPuzzleMain
     _ -> undefined
 
 \end{code}
