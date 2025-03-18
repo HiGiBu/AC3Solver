@@ -1,17 +1,19 @@
 \begin{code}
 module Sudoku where
 
-sudokuMain :: IO ()
-sudokuMain = undefined
+import Data.List (intercalate)
+import AC3Solver ( AC3 (..), ac3, ConstraintAA, Domain )
 
 \end{code}
 
-The constraints on any given cell is:
-    1. it must contain a distinct number than other cells in the same row,
-    2. it must contain a distinct number than other cells in the same column,
-    3. it must contain a distinct number than other cells in the same 3x3 box. 
+This file contains the implementation of Sudoku puzzles, printing Sudoku boards, and calling the AC3 solver on puzzles.
 
-An `Agent` can be represented by a cell, which in-turn can be represented as a tuple (i,j) where i is the row number and j is the column number. 
+The constraints on any given cell are:
+    1. it must contain a distinct number from other cells in the same row,
+    2. it must contain a distinct number from other cells in the same column,
+    3. it must contain a distinct number from other cells in the same 3x3 box. 
+
+An \textit{Agent} is represented by a cell, which in-turn is represented as a tuple $(i,j)$ where $i$ is the row number and $j$ is the column number. 
 
 \begin{code}
 -- Encode all possible cells in a 9x9 grid
@@ -47,11 +49,12 @@ sudokuMain = AC3 sudokuConstraints sudokuDomains
 
 \end{code}
 
-Creating an example puzzle that has a unique solution.
+Using the `sudokuConstraints` as a backbone we can define our own sudoku puzzle. It's quite tedious because it requires us to specify the initial grid. 
+The particular example below is a Sudoku puzzle with a unique solution.
 
 \begin{code}
 
--- Define the starting values
+-- Define the initial grid
 startingCellsUnique :: [Domain (Int, Int) Int]
 startingCellsUnique = [
     ((1,3), [1]),
@@ -99,7 +102,8 @@ sudokuExampleUnique = AC3 sudokuConstraints sudokuExampleDomainUnique
 
 \end{code}
 
-Function to visualize the Sudoku board.
+Here are some functions to visualize the initial board and what the board looks like after running AC3. Bear in mind that AC3 doesn't solve sudoku puzzles,
+but it severely reduces the domain of each cell. In some cases, it can partially start solving a puzzle by reducing the domain of some cells to a single value.
 
 \begin{code}
 
