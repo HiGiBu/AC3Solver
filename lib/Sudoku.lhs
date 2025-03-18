@@ -44,8 +44,8 @@ sudokuDomains :: [Domain (Int, Int) Int]
 sudokuDomains = [(i, [1..9]) | i <- allCells]
 
 -- An empty Sudoku puzzle (no cells filled in)
-sudokuMain :: AC3 (Int, Int) Int
-sudokuMain = AC3 sudokuConstraints sudokuDomains
+sudokuMain :: IO () --AC3 (Int, Int) Int
+sudokuMain = undefined--AC3 sudokuConstraints sudokuDomains
 
 \end{code}
 
