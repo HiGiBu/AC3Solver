@@ -1,3 +1,13 @@
+\subsection{The Graph Colouring library}\label{sec:GraphCol}
+
+Graph colouring is a well-known NP-Complete problem~\cite{GraphColRef}. 
+Its nature as a graph problem lends it well to being modelled as an \verb:AC3: instance,
+ and then being solved using our backtracking functions.
+
+A problem instance consists of an undirected graph, and an integer $n > 0$. 
+We are asked to assign a colour $0..(n-1)$ to each vertex, where for each edge $(u,v)$, 
+$u$ and $v$ have different colours. 
+
 \begin{code}
 --{-# LANGUAGE LambdaCase #-} -- todo remove? if not using data.graph.read...
 module GraphCol where
@@ -14,6 +24,20 @@ import AC3Solver
 import Backtracking
 import Scheduling (parseInput)
 
+\end{code}
+
+We make use of Haskell's Graph library, following in its convention that vertices are 
+numbers, and edges are pairs of vertices. 
+
+We define a newtype \verb:GraphCol: using \verb:AC3:, where the agents are of type \verb:Vertex: 
+and the domain is a set of colours $\subseteq$ \verb:[0..(n-1)]:.
+All constraints should be of the form \verb:(X,Y,(/=)):, and this represents an edge \verb:(X,Y):
+in the graph. 
+
+We define arbitrary instances for \verb:GraphCol: using following these conventions.
+
+\begin{code}
+
 -- We define a newtype, so that we can generate arbitrary instances.
 newtype GraphCol = GC (AC3 Vertex Int)
 
@@ -24,11 +48,13 @@ seqPair (ma, mb) = ma >>= \a -> mb >>= \b -> return (a,b)
 instance Arbitrary GraphCol where 
     arbitrary = sized arbitGraphColN where 
         arbitGraphColN n = do 
-            nColours <- choose (0, n `div` 2)
+            nColours <- choose (1, max (n `div` 2) 1) -- we require n to be > 0 
             sizeV <- choose (0, n) -- we make vertices 0..sizeV INCLUDING SIZEV!!
             sizeE <- choose (0,n)
             e <- sequence [seqPair (choose (0, sizeV), choose (0, sizeV)) | _<-[0..sizeE]]
-            let g = buildG (0, sizeV) e
+            -- we do not want edges (x,x)
+            let nonReflE = filter (uncurry (/=)) e
+            let g = buildG (0, sizeV) nonReflE
             return $ convertGraphToAC3 g nColours --return $ convertGraphToAC3 g n
 
 instance Show GraphCol where 
@@ -54,6 +80,7 @@ guaranteed to hold.
 -- NOTE: The Graph library uses *directed* graphs. 
 --        We add both (x,y,/=) and (y,x,/=), as graph colouring concerns Undirected graphs.
 -- Create an instance with colours [0..(n-1)]
+-- PRE: n >= 1
 convertGraphToAC3 :: Graph -> Int -> GraphCol 
 convertGraphToAC3 g n = let     
     agents = vertices g

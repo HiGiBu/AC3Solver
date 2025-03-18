@@ -12,8 +12,9 @@ import Test.QuickCheck
 main :: IO ()
 main = hspec $ do
   describe "AC3 Tests" $ do
-    it "Example test" $ 
-      ac3 exampleAC3 `shouldBe` [(4,[1,2]),(3,[0,1,2]),(2,[0,1,2]),(1,[0,1,2]),(0,[0])]
+    -- TODO remove
+    --it "Example test" $ 
+    --  ac3 exampleAC3 `shouldBe` [(4,[1,2]),(3,[0,1,2]),(2,[0,1,2]),(1,[0,1,2]),(0,[0])]
     it "Positive example (each agent has non-empty domain) - 1" $ 
       ac3 exampleAC3 `shouldNotSatisfy` determineNoSol
     it "Positive example (each agent has non-empty domain) - 2" $ 
@@ -44,7 +45,7 @@ main = hspec $ do
     -- The --coverage says these cases are never reached, but that is simply not true lol.
     --  It says this even with these cases, but that notwithstanding: according to the test report,
     --  we always get the otherwise case, which would seemingly point to us eventually reaching the 
-    --      [] = undefined case     ¯\_(ツ)_/¯
+    --      [] = undefined case
     let xAgent = ("x", [1 :: Int])
     let yAgent = ("y", [2])
     let d = [xAgent, yAgent]

@@ -1,3 +1,5 @@
+\subsection{The Scheduling library}\label{sec:Scheduling}
+
 \begin{code}
 module Scheduling where
 
