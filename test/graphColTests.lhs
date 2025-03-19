@@ -83,9 +83,18 @@ main = hspec $ do
       property (\(GC inst) -> let 
       (GC betterI) = optimiseGC (GC inst)
       in all (`elem` findAllSolutions inst) $ findAllSolutions betterI )
+    
+
+    it "All solutions after optimiseGC are legal" $ 
+      property (\(GC inst) -> let 
+      (GC betterI) = optimiseGC (GC inst)
+      in all (checkSolution (cons inst)) $ findAllSolutions betterI )
     -}
     -- too slow :{
-
+    
+    
+    
+    
     -- yeah so this is just Wrong... but maybe some of the code is useful in the future 
     {-
     it "G 2-colourable iff even degree" $ do 
