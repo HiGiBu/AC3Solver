@@ -73,6 +73,16 @@ main = hspec $ do
     -}
     --findAllSolutions can get *very* slow...
 
+    it "optimiseGC does not affect whether GC has a solution" $ 
+      property (\(GC inst) -> let 
+      (GC betterI) = optimiseGC (GC inst)
+      in findSolution inst == findSolution betterI )
+
+    it "any solution found after optimiseGC, should also have been possible before" $ 
+      property (\(GC inst) -> let 
+      (GC betterI) = optimiseGC (GC inst)
+      in all (`elem` findAllSolutions inst) $ findAllSolutions betterI )
+
     -- yeah so this is just Wrong... but maybe some of the code is useful in the future 
     {-
     it "G 2-colourable iff even degree" $ do 

@@ -102,12 +102,26 @@ ac3ToGraph (GC (AC3 c d)) = let
 
 
 
-{-
--- TODO Remove?
-ac3GetNcolours :: GraphCol -> Int 
-ac3GetNcolours (GC (AC3 _ (d':ds))) = (\(_,xs) -> foldr max 0 xs) d'
-ac3GetNcolours (GC (AC3 _ d)) = foldr (\(_,xs) -> foldr max 0 xs) 0 d
--}
+\end{code}
+
+We provide a section of code that may optimise the \verb:GraphCol: instance.
+We assign the colour 0 to the vertex 0, as in graph colouring we can arbitrarily
+assign a colour to the `first' vertex. 
+
+However, if the graph consists of multiple disconnected components, then we can 
+do such an arbitrary assignment to a vertex in each separate component, thereby reducing 
+the search space. 
+
+\begin{code}
+
+optimiseGC :: GraphCol -> GraphCol
+optimiseGC gc@(GC (AC3 c d)) = let  
+  comps = components $ ac3ToGraph gc
+  -- if 0 is in the tree, we want to just keep 0. Else, we will take the root and 
+  -- (arbit.ly) assign it the colour 0, as it is in a separate component to 0.
+  dChanges = map (\t@(Node r _) -> if 0 `elem` t then 0 else r) comps
+  in GC (AC3 c (map (\(a,b) -> if a `elem` dChanges then (a,[0]) else (a,b)) d))
+
 
 \end{code}
 
