@@ -118,15 +118,15 @@ The actual main part of the programme, for Graph Colouring:
 getGraphChoice :: IO Int
 getGraphChoice = do 
   putStr "Choose one of the following options: \n\
-         \1: Read in a graph from the terminal \n\
-         \2: TODO \n"
+         \1: Read in a graph colouring instance from the terminal \n\
+         \2: Read in a graph colouring instance from a file \n"
   choice <- getLine 
   case readMaybe choice of 
     Nothing -> do
       putStrLn "Invalid choice, please try again."
       getGraphChoice
     Just n -> 
-      if n > 0 && n < 2 then return n else do 
+      if n > 0 && n < 3 then return n else do 
         putStrLn "Invalid choice, please try again."
         getGraphChoice
 
@@ -135,6 +135,7 @@ graphColMain = do
     choice <- getGraphChoice
     case choice of 
         1 -> terminalGraph
+        2 -> readGraphFromFile
         _ -> undefined
 
 -- PRE: m <= n.
@@ -159,7 +160,7 @@ terminalGraph = do
   let graph = buildG (0, nVertices-1) eList
   nColours <- parseInput "Enter the number of colours: "
   let g = convertGraphToAC3 graph nColours 
-  putStrLn "We run AC3 on this instance."
+  putStrLn $ "We run AC3 on this instance: " ++ show g
   runGraph g
 
 
@@ -189,6 +190,33 @@ runGraph (GC ac3Inst) = do
 
 
 
+readGraphFromFile :: IO ()
+readGraphFromFile = do  
+  putStrLn "We expect the file to be of the following format: \n\
+            \[number of vertices] \n\
+            \[number of edges] \n\
+            \for each edge: [vertex 1] [vertex 2] of the edge. \n\
+            \[the number of colours > 0.]\n"
+  putStrLn "Provide the file name:"
+  filename <- getLine 
+  filecon <- readFile filename 
+  let fileInput = words filecon
+  let nVertices = read $ head fileInput
+  let nEdges = read $ head (tail fileInput)
+  let edgeList = makeEdges nEdges (drop 2 fileInput) -- includes nColours
+  let nColours = read $ last fileInput
+  let graph = buildG (0, nVertices-1) edgeList
+  let g = convertGraphToAC3 graph nColours 
+  putStrLn $ "We run AC3 on this instance: " ++ show g
+  runGraph g
+
+-- PRE: n >= 0.
+makeEdges :: Int -> [String] -> [Edge]
+makeEdges 0 _ = []
+-- if n > 0, but we have run out of edges -> fail
+makeEdges _ [] = undefined
+makeEdges _ [_] = undefined
+makeEdges n (x:y:es) = (read x, read y) : makeEdges (n-1) es
 
 
 -- Note: The graph we read in must be a CSV of an adjecency list; 
