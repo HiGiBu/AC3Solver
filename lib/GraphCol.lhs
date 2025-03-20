@@ -13,6 +13,7 @@ $u$ and $v$ have different colours.
 module GraphCol where
 
 import Control.Monad (when, foldM_)
+import Criterion.Main
 import Data.Char (toUpper)
 import Data.Graph
 --import Data.Graph.Read
@@ -48,9 +49,9 @@ seqPair (ma, mb) = ma >>= \a -> mb >>= \b -> return (a,b)
 instance Arbitrary GraphCol where 
     arbitrary = sized arbitGraphColN where 
         arbitGraphColN n = do 
-            nColours <- choose (1, max (n `div` 2) 1) -- we require n to be > 0 
-            sizeV <- choose (0, n) -- we make vertices 0..sizeV INCLUDING SIZEV!!
-            sizeE <- choose (0,n)
+            nColours <- choose (1, max (n `div` 4) 1) -- we require n to be > 0 
+            sizeV <- choose (0, n `div` 3) -- we make vertices 0..sizeV INCLUDING SIZEV!
+            sizeE <- choose (0,n `div` 2)
             e <- sequence [seqPair (choose (0, sizeV), choose (0, sizeV)) | _<-[0..sizeE]]
             -- we do not want edges (x,x)
             let nonReflE = filter (uncurry (/=)) e
@@ -133,14 +134,15 @@ getGraphChoice :: IO Int
 getGraphChoice = do 
   putStr "Choose one of the following options: \n\
          \1: Read in a graph colouring instance from the terminal \n\
-         \2: Read in a graph colouring instance from a file \n"
+         \2: Read in a graph colouring instance from a file \n\
+         \3: Run benchmarks \n"
   choice <- getLine 
   case readMaybe choice of 
     Nothing -> do
       putStrLn "Invalid choice, please try again."
       getGraphChoice
     Just n -> 
-      if n > 0 && n < 3 then return n else do 
+      if n > 0 && n < 4 then return n else do 
         putStrLn "Invalid choice, please try again."
         getGraphChoice
 
@@ -150,6 +152,7 @@ graphColMain = do
     case choice of 
         1 -> terminalGraph
         2 -> fileGraph
+        3 -> benchmarkTests
         _ -> undefined
 
 -- PRE: m <= n.
@@ -201,6 +204,12 @@ runGraph (GC ac3Inst) = do
               choice2 <- getLine
               when (toUpper (head choice2) == 'Y') $ mapM_ print allSols
             
+\end{code}
+ 
+PROBABLY TODO REMOVE (but nice to break up)
+
+\begin{code}
+
 
 readGraphFromFile :: String -> IO GraphCol
 readGraphFromFile filename = do 
@@ -246,22 +255,6 @@ makeEdges _ [_] = undefined
 makeEdges n (x:y:es) = (read x, read y) : makeEdges (n-1) es
 
 
--- Note: The graph we read in must be a CSV of an adjecency list; 
--- https://hackage.haskell.org/package/graphite-0.10.0.1/docs/Data-Graph-Read.html
-csvGraph :: IO ()
-csvGraph = undefined
-{-csvGraph = do 
-    putStrLn "Give a filepath to the graph you want to read in."
-    filePath <- getLine 
-    x <- fromCsv filePath
-
-    undefined
-    --case fromCsv filePath of
-    --    Left _ -> undefined
-    --    Right _ -> undefined
-
--}
-
 graphFileFormat :: GraphCol -> IO () 
 graphFileFormat (GC (AC3 c d)) = do 
   --let nVertices = (fst . last . sort) d 
@@ -276,5 +269,46 @@ graphFileFormat (GC (AC3 c d)) = do
   -- print nColours
   print . succ $ foldr (\(_,ds) x -> foldr max x ds) 0 d
 
+\end{code}
+ 
+PROBABLY TODO REMOVE (but nice to break up)
+
+\begin{code}
+
+-- A method to note the difference before & after running AC3.
+getTotalDomainOptions :: [Domain a b] -> Int 
+getTotalDomainOptions = foldr (\(_, ds) prev -> length ds + prev) 0
+
+testFiles :: [String] --TODO: Automate this for all files in /lib 
+testFiles = map ("graphcolInstances/"++) ["n10e16nc14.txt", "n10e18nc9.txt", "n15e16nc2.txt", "n15e38nc6.txt", "n20e96nc20.txt", "n25e110nc15.txt", "n25e134nc22.txt"]
+
+benchmarkTests :: IO ()
+benchmarkTests = mapM_ runBenchmark testFiles
+
+runBenchmark :: String -> IO () 
+runBenchmark filename = do
+  gc@(GC inst) <- readGraphFromFile filename
+  let origNOpts =  getTotalDomainOptions $ domains inst
+  let newD = ac3 inst  
+  let newNOpts = getTotalDomainOptions newD
+
+  let (GC optiInst) = optimiseGC gc 
+  let newOptiD = ac3 optiInst
+  let newNOptiD = getTotalDomainOptions newOptiD
+
+  putStrLn $ "Filename: " ++ filename 
+  putStrLn $ "Pre AC-3:        " ++ show origNOpts
+  putStrLn $ "Post AC-3:       " ++ show newNOpts
+  putStrLn $ "OptimiseGC:      " ++ (show . getTotalDomainOptions . domains) optiInst
+  putStrLn $ "OptimiseGC AC-3: " ++ show newNOptiD
+  
+  -- Benchmark Criterion bit
+  defaultMain [
+    bgroup filename [ bench "pre AC-3" $ whnf findSolution inst
+                    , bench "post AC-3" $ whnf findSolution (AC3 (cons inst) (ac3 inst))
+                    , bench "OptimiseGC, no AC-3" $ whnf (\(GC oi) -> findSolution oi) (optimiseGC gc)
+                    , bench "OptimiseGC, + AC-3 " $ whnf (\(GC oi) -> findSolution (AC3 (cons inst) (ac3 oi))) (optimiseGC gc)
+                    ]
+    ]
 
 \end{code}

@@ -18,6 +18,7 @@ dependencies:
   - random
   - template-haskell
   - graphite
+  - criterion
 
 library:
   source-dirs: lib
