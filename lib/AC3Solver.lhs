@@ -71,11 +71,11 @@ checkDomain (x:xs) ys c = do
 \end{code}
 }
 
-Each time we call iterate, we start of by looking for the domains of agents X \& Y 
+Each time we call iterate, we start by looking for the domains of agents X \& Y 
 for our constraint (X,Y). Once we find these, we are likely to replace the original
 domain for X with a reduced one. We use \verb:popXy: and \verb:popX: to find the domains
 for X \& Y, and at the same time we also remove the \emph{old} domain for X. 
-    Using \verb:popXy:, we do 1 walk through the list, and save us 2 walks compared to doing a separate lookup for y, and 
+    Using \verb:popXy:, we do one walk through the list, and save two walks, compared to doing a separate lookup for y, and 
     a separate walk to delete the old x. 
 % Once we have checked the current constraint, we then add back the \emph{new} domain for X.
 
