@@ -12,7 +12,7 @@ $u$ and $v$ have different colours.
 --{-# LANGUAGE LambdaCase #-} -- todo remove? if not using data.graph.read...
 module GraphCol where
 
-import Control.Monad (when)
+import Control.Monad (when, foldM)
 import Data.Char (toUpper)
 import Data.Graph
 --import Data.Graph.Read
@@ -149,7 +149,7 @@ graphColMain = do
     choice <- getGraphChoice
     case choice of 
         1 -> terminalGraph
-        2 -> readGraphFromFile
+        2 -> fileGraph
         _ -> undefined
 
 -- PRE: m <= n.
@@ -202,17 +202,8 @@ runGraph (GC ac3Inst) = do
               when (toUpper (head choice2) == 'Y') $ mapM_ print allSols
             
 
-
-
-readGraphFromFile :: IO ()
-readGraphFromFile = do  
-  putStrLn "We expect the file to be of the following format: \n\
-            \[number of vertices] \n\
-            \[number of edges] \n\
-            \for each edge: [vertex 1] [vertex 2] of the edge. \n\
-            \[the number of colours > 0.]\n"
-  putStrLn "Provide the file name:"
-  filename <- getLine 
+readGraphFromFile :: String -> IO GraphCol
+readGraphFromFile filename = do 
   filecon <- readFile filename 
   let fileInput = words filecon
   let nVertices = read $ head fileInput
@@ -221,6 +212,28 @@ readGraphFromFile = do
   let nColours = read $ last fileInput
   let graph = buildG (0, nVertices-1) edgeList
   let g = convertGraphToAC3 graph nColours 
+  return g
+
+fileGraph :: IO ()
+fileGraph = do  
+  putStrLn "We expect the file to be of the following format: \n\
+            \[number of vertices] \n\
+            \[number of edges] \n\
+            \for each edge: [vertex 1] [vertex 2] of the edge. \n\
+            \[the number of colours > 0.]\n"
+  putStrLn "Provide the file name:"
+  filename <- getLine 
+  {- 
+  filecon <- readFile filename 
+  let fileInput = words filecon
+  let nVertices = read $ head fileInput
+  let nEdges = read $ head (tail fileInput)
+  let edgeList = makeEdges nEdges (drop 2 fileInput) -- includes nColours
+  let nColours = read $ last fileInput
+  let graph = buildG (0, nVertices-1) edgeList
+  let g = convertGraphToAC3 graph nColours 
+  -}
+  g <- readGraphFromFile filename
   putStrLn $ "We run AC3 on this instance: " ++ show g
   runGraph g
 
@@ -248,5 +261,20 @@ csvGraph = undefined
     --    Right _ -> undefined
 
 -}
+
+graphFileFormat :: GraphCol -> IO () 
+graphFileFormat (GC (AC3 c d)) = do 
+  --let nVertices = (fst . last . sort) d 
+  -- nVertices
+  -- succ, as we want vertices from (0..n-1)
+  (putStrLn . show . succ . fst . last . sort) d 
+  --let nEdges = length c
+  -- nEdges
+  putStrLn $ (show . length) c
+  -- print each edge
+  foldM ( \_ (x,y,_) -> putStrLn $ show x ++ " " ++ show y) () c
+  -- print nColours
+  putStrLn . show . succ $ foldr (\(_,ds) x -> foldr max x ds) 0 d
+
 
 \end{code}
