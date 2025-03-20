@@ -12,7 +12,7 @@ $u$ and $v$ have different colours.
 --{-# LANGUAGE LambdaCase #-} -- todo remove? if not using data.graph.read...
 module GraphCol where
 
-import Control.Monad (when, foldM)
+import Control.Monad (when, foldM_)
 import Data.Char (toUpper)
 import Data.Graph
 --import Data.Graph.Read
@@ -267,14 +267,14 @@ graphFileFormat (GC (AC3 c d)) = do
   --let nVertices = (fst . last . sort) d 
   -- nVertices
   -- succ, as we want vertices from (0..n-1)
-  (putStrLn . show . succ . fst . last . sort) d 
+  (print . succ . fst . maximum) d 
   --let nEdges = length c
   -- nEdges
-  putStrLn $ (show . length) c
+  (print . length) c
   -- print each edge
-  foldM ( \_ (x,y,_) -> putStrLn $ show x ++ " " ++ show y) () c
+  foldM_ ( \_ (x,y,_) -> putStrLn $ show x ++ " " ++ show y) () c
   -- print nColours
-  putStrLn . show . succ $ foldr (\(_,ds) x -> foldr max x ds) 0 d
+  print . succ $ foldr (\(_,ds) x -> foldr max x ds) 0 d
 
 
 \end{code}
