@@ -51,10 +51,11 @@ instance Arbitrary GraphCol where
         arbitGraphColN n = do 
             nColours <- choose (1, max (n `div` 4) 1) -- we require n to be > 0 
             sizeV <- choose (0, n `div` 3) -- we make vertices 0..sizeV INCLUDING SIZEV!
-            sizeE <- choose (0,n `div` 2)
+            let eMax = max sizeV $ (sizeV*(sizeV-1)) `div` 3
+            sizeE <- choose (sizeV, eMax)
             e <- sequence [seqPair (choose (0, sizeV), choose (0, sizeV)) | _<-[0..sizeE]]
-            -- we do not want edges (x,x)
-            let nonReflE = filter (uncurry (/=)) e
+            -- we do not want edges (x,x), nor do we want repeat edges
+            let nonReflE = nub $ filter (uncurry (/=)) e
             let g = buildG (0, sizeV) nonReflE
             return $ convertGraphToAC3 g nColours --return $ convertGraphToAC3 g n
 
@@ -280,7 +281,11 @@ getTotalDomainOptions :: [Domain a b] -> Int
 getTotalDomainOptions = foldr (\(_, ds) prev -> length ds + prev) 0
 
 testFiles :: [String] --TODO: Automate this for all files in /lib 
-testFiles = map ("graphcolInstances/"++) ["n10e16nc14.txt", "n10e18nc9.txt", "n15e16nc2.txt", "n15e38nc6.txt", "n20e96nc20.txt", "n25e110nc15.txt", "n25e134nc22.txt"]
+testFiles = map ("graphcolInstances/"++) 
+  ["n10e16nc14.txt", "n10e18nc9.txt", "n10e22nc2.txt", "n15e16nc2.txt", 
+   "n15e38nc6.txt", "n15e44nc4.txt", 
+   "n20e96nc20.txt", "n20e188nc6.txt", 
+   "n25e110nc15.txt", "n25e134nc22.txt"]
 
 benchmarkTests :: IO ()
 benchmarkTests = mapM_ runBenchmark testFiles
