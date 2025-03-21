@@ -1,0 +1,570 @@
+Hello!
+Choose one of the following options: 
+1: Graph Colouring 
+2: N-Queens 
+3: Scheduling 
+4: Sudoku 
+5: Zebra Puzzle 
+Choose one of the following options: 
+1: Read in a graph colouring instance from the terminal 
+2: Read in a graph colouring instance from a file 
+3: Run benchmarks 
+Filename: graphcolInstances/n10e16nc14.txt
+Pre AC-3:        127
+Post AC-3:       124
+OptimiseGC:      101
+OptimiseGC AC-3: 98
+benchmarking graphcolInstances/n10e16nc14.txt/pre AC-3
+time                 4.727 μs   (4.686 μs .. 4.771 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 4.808 μs   (4.765 μs .. 4.865 μs)
+std dev              166.9 ns   (130.7 ns .. 248.4 ns)
+variance introduced by outliers: 44% (moderately inflated)
+
+benchmarking graphcolInstances/n10e16nc14.txt/post AC-3
+time                 4.079 μs   (4.046 μs .. 4.114 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 4.095 μs   (4.065 μs .. 4.126 μs)
+std dev              105.9 ns   (87.93 ns .. 129.2 ns)
+variance introduced by outliers: 31% (moderately inflated)
+
+benchmarking graphcolInstances/n10e16nc14.txt/OptimiseGC, no AC-3
+time                 4.779 μs   (4.747 μs .. 4.811 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 4.781 μs   (4.761 μs .. 4.802 μs)
+std dev              69.45 ns   (56.68 ns .. 91.26 ns)
+variance introduced by outliers: 12% (moderately inflated)
+
+benchmarking graphcolInstances/n10e16nc14.txt/OptimiseGC, + AC-3 
+time                 23.78 μs   (23.61 μs .. 23.95 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 23.84 μs   (23.69 μs .. 24.09 μs)
+std dev              608.9 ns   (427.2 ns .. 944.9 ns)
+variance introduced by outliers: 26% (moderately inflated)
+
+Filename: graphcolInstances/n10e18nc9.txt
+Pre AC-3:        82
+Post AC-3:       81
+OptimiseGC:      58
+OptimiseGC AC-3: 57
+benchmarking graphcolInstances/n10e18nc9.txt/pre AC-3
+time                 5.461 μs   (5.304 μs .. 5.674 μs)
+                     0.993 R²   (0.981 R² .. 1.000 R²)
+mean                 5.380 μs   (5.319 μs .. 5.587 μs)
+std dev              339.8 ns   (103.1 ns .. 687.3 ns)
+variance introduced by outliers: 73% (severely inflated)
+
+benchmarking graphcolInstances/n10e18nc9.txt/post AC-3
+time                 4.491 μs   (4.456 μs .. 4.533 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 4.470 μs   (4.438 μs .. 4.501 μs)
+std dev              110.7 ns   (91.47 ns .. 136.7 ns)
+variance introduced by outliers: 29% (moderately inflated)
+
+benchmarking graphcolInstances/n10e18nc9.txt/OptimiseGC, no AC-3
+time                 5.293 μs   (5.236 μs .. 5.348 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 5.319 μs   (5.279 μs .. 5.357 μs)
+std dev              135.0 ns   (110.9 ns .. 169.7 ns)
+variance introduced by outliers: 29% (moderately inflated)
+
+benchmarking graphcolInstances/n10e18nc9.txt/OptimiseGC, + AC-3 
+time                 18.72 μs   (18.53 μs .. 18.89 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 18.56 μs   (18.46 μs .. 18.68 μs)
+std dev              349.2 ns   (287.0 ns .. 421.2 ns)
+variance introduced by outliers: 16% (moderately inflated)
+
+Filename: graphcolInstances/n10e22nc2.txt
+Pre AC-3:        19
+Post AC-3:       0
+OptimiseGC:      19
+OptimiseGC AC-3: 0
+benchmarking graphcolInstances/n10e22nc2.txt/pre AC-3
+time                 14.38 μs   (14.19 μs .. 14.60 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 14.16 μs   (14.04 μs .. 14.33 μs)
+std dev              493.0 ns   (363.6 ns .. 750.0 ns)
+variance introduced by outliers: 41% (moderately inflated)
+
+benchmarking graphcolInstances/n10e22nc2.txt/post AC-3
+time                 5.389 ns   (5.375 ns .. 5.408 ns)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 5.387 ns   (5.378 ns .. 5.403 ns)
+std dev              38.74 ps   (26.12 ps .. 67.85 ps)
+
+benchmarking graphcolInstances/n10e22nc2.txt/OptimiseGC, no AC-3
+time                 13.96 μs   (13.85 μs .. 14.05 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 13.87 μs   (13.77 μs .. 13.95 μs)
+std dev              301.3 ns   (244.3 ns .. 386.5 ns)
+variance introduced by outliers: 21% (moderately inflated)
+
+benchmarking graphcolInstances/n10e22nc2.txt/OptimiseGC, + AC-3 
+time                 14.39 μs   (14.27 μs .. 14.57 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 14.30 μs   (14.24 μs .. 14.41 μs)
+std dev              263.5 ns   (127.1 ns .. 427.3 ns)
+variance introduced by outliers: 16% (moderately inflated)
+
+Filename: graphcolInstances/n15e16nc2.txt
+Pre AC-3:        29
+Post AC-3:       29
+OptimiseGC:      22
+OptimiseGC AC-3: 15
+benchmarking graphcolInstances/n15e16nc2.txt/pre AC-3
+time                 6.478 μs   (6.409 μs .. 6.559 μs)
+                     0.999 R²   (0.999 R² .. 0.999 R²)
+mean                 6.480 μs   (6.417 μs .. 6.538 μs)
+std dev              195.5 ns   (164.9 ns .. 239.0 ns)
+variance introduced by outliers: 37% (moderately inflated)
+
+benchmarking graphcolInstances/n15e16nc2.txt/post AC-3
+time                 6.247 μs   (6.201 μs .. 6.307 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 6.337 μs   (6.253 μs .. 6.499 μs)
+std dev              383.3 ns   (194.7 ns .. 655.7 ns)
+variance introduced by outliers: 71% (severely inflated)
+
+benchmarking graphcolInstances/n15e16nc2.txt/OptimiseGC, no AC-3
+time                 6.633 μs   (6.513 μs .. 6.791 μs)
+                     0.992 R²   (0.980 R² .. 0.999 R²)
+mean                 6.730 μs   (6.585 μs .. 7.171 μs)
+std dev              781.2 ns   (267.3 ns .. 1.565 μs)
+variance introduced by outliers: 90% (severely inflated)
+
+benchmarking graphcolInstances/n15e16nc2.txt/OptimiseGC, + AC-3 
+time                 14.38 μs   (14.30 μs .. 14.50 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 14.33 μs   (14.29 μs .. 14.40 μs)
+std dev              171.3 ns   (117.4 ns .. 267.7 ns)
+
+Filename: graphcolInstances/n15e38nc6.txt
+Pre AC-3:        85
+Post AC-3:       85
+OptimiseGC:      75
+OptimiseGC AC-3: 71
+benchmarking graphcolInstances/n15e38nc6.txt/pre AC-3
+time                 17.13 μs   (16.76 μs .. 17.49 μs)
+                     0.998 R²   (0.996 R² .. 0.999 R²)
+mean                 16.68 μs   (16.51 μs .. 16.90 μs)
+std dev              660.2 ns   (510.9 ns .. 912.9 ns)
+variance introduced by outliers: 47% (moderately inflated)
+
+benchmarking graphcolInstances/n15e38nc6.txt/post AC-3
+time                 15.23 μs   (15.03 μs .. 15.39 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 14.99 μs   (14.86 μs .. 15.11 μs)
+std dev              416.4 ns   (348.3 ns .. 489.3 ns)
+variance introduced by outliers: 31% (moderately inflated)
+
+benchmarking graphcolInstances/n15e38nc6.txt/OptimiseGC, no AC-3
+time                 16.68 μs   (16.52 μs .. 16.84 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 16.96 μs   (16.73 μs .. 17.60 μs)
+std dev              1.169 μs   (484.0 ns .. 2.083 μs)
+variance introduced by outliers: 73% (severely inflated)
+
+benchmarking graphcolInstances/n15e38nc6.txt/OptimiseGC, + AC-3 
+time                 44.85 μs   (44.47 μs .. 45.17 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 44.57 μs   (44.13 μs .. 45.14 μs)
+std dev              1.596 μs   (1.242 μs .. 2.349 μs)
+variance introduced by outliers: 38% (moderately inflated)
+
+Filename: graphcolInstances/n15e44nc4.txt
+Pre AC-3:        57
+Post AC-3:       53
+OptimiseGC:      54
+OptimiseGC AC-3: 50
+benchmarking graphcolInstances/n15e44nc4.txt/pre AC-3
+time                 18.98 μs   (18.72 μs .. 19.23 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 18.80 μs   (18.66 μs .. 18.95 μs)
+std dev              486.7 ns   (396.5 ns .. 644.3 ns)
+variance introduced by outliers: 27% (moderately inflated)
+
+benchmarking graphcolInstances/n15e44nc4.txt/post AC-3
+time                 18.18 μs   (17.91 μs .. 18.51 μs)
+                     0.998 R²   (0.996 R² .. 0.999 R²)
+mean                 18.13 μs   (18.00 μs .. 18.35 μs)
+std dev              550.1 ns   (397.0 ns .. 928.0 ns)
+variance introduced by outliers: 34% (moderately inflated)
+
+benchmarking graphcolInstances/n15e44nc4.txt/OptimiseGC, no AC-3
+time                 18.97 μs   (18.72 μs .. 19.18 μs)
+                     0.999 R²   (0.999 R² .. 0.999 R²)
+mean                 18.78 μs   (18.61 μs .. 18.94 μs)
+std dev              532.7 ns   (453.5 ns .. 669.0 ns)
+variance introduced by outliers: 31% (moderately inflated)
+
+benchmarking graphcolInstances/n15e44nc4.txt/OptimiseGC, + AC-3 
+time                 49.30 μs   (48.85 μs .. 49.76 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 49.09 μs   (48.76 μs .. 49.50 μs)
+std dev              1.190 μs   (1.027 μs .. 1.406 μs)
+variance introduced by outliers: 22% (moderately inflated)
+
+Filename: graphcolInstances/n20e96nc20.txt
+Pre AC-3:        381
+Post AC-3:       376
+OptimiseGC:      381
+OptimiseGC AC-3: 376
+benchmarking graphcolInstances/n20e96nc20.txt/pre AC-3
+time                 60.28 μs   (59.44 μs .. 61.25 μs)
+                     0.998 R²   (0.998 R² .. 0.999 R²)
+mean                 61.37 μs   (60.74 μs .. 62.04 μs)
+std dev              2.233 μs   (1.935 μs .. 2.574 μs)
+variance introduced by outliers: 38% (moderately inflated)
+
+benchmarking graphcolInstances/n20e96nc20.txt/post AC-3
+time                 53.63 μs   (52.84 μs .. 54.22 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 54.59 μs   (53.94 μs .. 55.25 μs)
+std dev              2.250 μs   (1.884 μs .. 2.732 μs)
+variance introduced by outliers: 45% (moderately inflated)
+
+benchmarking graphcolInstances/n20e96nc20.txt/OptimiseGC, no AC-3
+time                 58.44 μs   (57.62 μs .. 59.32 μs)
+                     0.996 R²   (0.991 R² .. 0.999 R²)
+mean                 59.67 μs   (58.65 μs .. 62.83 μs)
+std dev              5.353 μs   (2.445 μs .. 11.03 μs)
+variance introduced by outliers: 79% (severely inflated)
+
+benchmarking graphcolInstances/n20e96nc20.txt/OptimiseGC, + AC-3 
+time                 251.4 μs   (249.0 μs .. 253.6 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 248.7 μs   (246.6 μs .. 251.4 μs)
+std dev              7.942 μs   (5.618 μs .. 12.82 μs)
+variance introduced by outliers: 27% (moderately inflated)
+
+Filename: graphcolInstances/n20e188nc6.txt
+Pre AC-3:        115
+Post AC-3:       104
+OptimiseGC:      115
+OptimiseGC AC-3: 104
+benchmarking graphcolInstances/n20e188nc6.txt/pre AC-3
+time                 125.6 μs   (122.7 μs .. 128.4 μs)
+                     0.998 R²   (0.996 R² .. 0.999 R²)
+mean                 125.1 μs   (123.8 μs .. 126.2 μs)
+std dev              4.170 μs   (3.115 μs .. 5.306 μs)
+variance introduced by outliers: 31% (moderately inflated)
+
+benchmarking graphcolInstances/n20e188nc6.txt/post AC-3
+time                 118.4 μs   (116.9 μs .. 120.2 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 118.1 μs   (116.5 μs .. 119.9 μs)
+std dev              5.481 μs   (4.238 μs .. 8.231 μs)
+variance introduced by outliers: 48% (moderately inflated)
+
+benchmarking graphcolInstances/n20e188nc6.txt/OptimiseGC, no AC-3
+time                 126.2 μs   (122.5 μs .. 129.3 μs)
+                     0.996 R²   (0.994 R² .. 0.998 R²)
+mean                 123.1 μs   (121.6 μs .. 124.7 μs)
+std dev              5.200 μs   (4.240 μs .. 7.209 μs)
+variance introduced by outliers: 43% (moderately inflated)
+
+benchmarking graphcolInstances/n20e188nc6.txt/OptimiseGC, + AC-3 
+time                 390.9 μs   (386.8 μs .. 395.4 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 401.6 μs   (396.5 μs .. 410.2 μs)
+std dev              21.71 μs   (14.42 μs .. 33.73 μs)
+variance introduced by outliers: 49% (moderately inflated)
+
+Filename: graphcolInstances/n25e110nc15.txt
+Pre AC-3:        361
+Post AC-3:       357
+OptimiseGC:      361
+OptimiseGC AC-3: 357
+benchmarking graphcolInstances/n25e110nc15.txt/pre AC-3
+time                 81.21 μs   (79.87 μs .. 82.92 μs)
+                     0.997 R²   (0.996 R² .. 0.999 R²)
+mean                 83.67 μs   (82.57 μs .. 86.55 μs)
+std dev              5.554 μs   (2.843 μs .. 10.44 μs)
+variance introduced by outliers: 66% (severely inflated)
+
+benchmarking graphcolInstances/n25e110nc15.txt/post AC-3
+time                 76.08 μs   (74.90 μs .. 77.49 μs)
+                     0.998 R²   (0.995 R² .. 0.999 R²)
+mean                 75.90 μs   (75.17 μs .. 76.94 μs)
+std dev              2.851 μs   (2.036 μs .. 4.611 μs)
+variance introduced by outliers: 39% (moderately inflated)
+
+benchmarking graphcolInstances/n25e110nc15.txt/OptimiseGC, no AC-3
+time                 83.16 μs   (81.79 μs .. 84.66 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 84.52 μs   (83.72 μs .. 85.10 μs)
+std dev              2.289 μs   (1.705 μs .. 3.215 μs)
+variance introduced by outliers: 24% (moderately inflated)
+
+benchmarking graphcolInstances/n25e110nc15.txt/OptimiseGC, + AC-3 
+time                 253.7 μs   (251.7 μs .. 255.7 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 254.9 μs   (253.2 μs .. 256.7 μs)
+std dev              5.905 μs   (5.041 μs .. 7.242 μs)
+variance introduced by outliers: 16% (moderately inflated)
+
+Filename: graphcolInstances/n25e134nc22.txt
+Pre AC-3:        529
+Post AC-3:       526
+OptimiseGC:      529
+OptimiseGC AC-3: 526
+benchmarking graphcolInstances/n25e134nc22.txt/pre AC-3
+time                 98.98 μs   (98.44 μs .. 99.69 μs)
+                     0.999 R²   (0.999 R² .. 0.999 R²)
+mean                 102.3 μs   (101.2 μs .. 103.4 μs)
+std dev              4.006 μs   (3.452 μs .. 4.815 μs)
+variance introduced by outliers: 40% (moderately inflated)
+
+benchmarking graphcolInstances/n25e134nc22.txt/post AC-3
+time                 105.6 μs   (104.3 μs .. 106.6 μs)
+                     0.999 R²   (0.999 R² .. 0.999 R²)
+mean                 102.9 μs   (101.7 μs .. 103.9 μs)
+std dev              3.728 μs   (3.207 μs .. 4.517 μs)
+variance introduced by outliers: 36% (moderately inflated)
+
+benchmarking graphcolInstances/n25e134nc22.txt/OptimiseGC, no AC-3
+time                 102.1 μs   (100.4 μs .. 103.8 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 100.1 μs   (99.10 μs .. 101.3 μs)
+std dev              3.702 μs   (3.030 μs .. 4.799 μs)
+variance introduced by outliers: 37% (moderately inflated)
+
+benchmarking graphcolInstances/n25e134nc22.txt/OptimiseGC, + AC-3 
+time                 373.1 μs   (368.5 μs .. 376.9 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 374.5 μs   (372.0 μs .. 377.6 μs)
+std dev              9.536 μs   (7.450 μs .. 13.73 μs)
+variance introduced by outliers: 18% (moderately inflated)
+
+Filename: graphcolInstances/n10e26nc7_Single1.txt
+Pre AC-3:        64
+Post AC-3:       59
+OptimiseGC:      64
+OptimiseGC AC-3: 59
+benchmarking graphcolInstances/n10e26nc7_Single1.txt/pre AC-3
+time                 7.947 μs   (7.835 μs .. 8.059 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 7.857 μs   (7.789 μs .. 7.928 μs)
+std dev              227.8 ns   (184.3 ns .. 290.8 ns)
+variance introduced by outliers: 34% (moderately inflated)
+
+benchmarking graphcolInstances/n10e26nc7_Single1.txt/post AC-3
+time                 7.165 μs   (7.098 μs .. 7.239 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 7.149 μs   (7.104 μs .. 7.197 μs)
+std dev              162.6 ns   (125.2 ns .. 213.9 ns)
+variance introduced by outliers: 25% (moderately inflated)
+
+benchmarking graphcolInstances/n10e26nc7_Single1.txt/OptimiseGC, no AC-3
+time                 7.859 μs   (7.766 μs .. 7.959 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 7.935 μs   (7.845 μs .. 8.021 μs)
+std dev              291.0 ns   (245.9 ns .. 340.4 ns)
+variance introduced by outliers: 46% (moderately inflated)
+
+benchmarking graphcolInstances/n10e26nc7_Single1.txt/OptimiseGC, + AC-3 
+time                 27.15 μs   (26.70 μs .. 27.61 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 26.97 μs   (26.80 μs .. 27.22 μs)
+std dev              661.7 ns   (522.6 ns .. 940.2 ns)
+variance introduced by outliers: 24% (moderately inflated)
+
+Filename: graphcolInstances/n20e26nc7_Single2.txt
+Pre AC-3:        134
+Post AC-3:       134
+OptimiseGC:      74
+OptimiseGC AC-3: 69
+benchmarking graphcolInstances/n20e26nc7_Single2.txt/pre AC-3
+time                 14.30 μs   (14.20 μs .. 14.42 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 14.40 μs   (14.24 μs .. 14.78 μs)
+std dev              742.7 ns   (239.9 ns .. 1.280 μs)
+variance introduced by outliers: 61% (severely inflated)
+
+benchmarking graphcolInstances/n20e26nc7_Single2.txt/post AC-3
+time                 12.18 μs   (11.98 μs .. 12.38 μs)
+                     0.998 R²   (0.995 R² .. 0.999 R²)
+mean                 12.16 μs   (12.03 μs .. 12.42 μs)
+std dev              628.0 ns   (405.8 ns .. 1.066 μs)
+variance introduced by outliers: 61% (severely inflated)
+
+benchmarking graphcolInstances/n20e26nc7_Single2.txt/OptimiseGC, no AC-3
+time                 14.44 μs   (14.25 μs .. 14.68 μs)
+                     0.997 R²   (0.993 R² .. 0.999 R²)
+mean                 14.86 μs   (14.53 μs .. 15.66 μs)
+std dev              1.659 μs   (657.0 ns .. 2.762 μs)
+variance introduced by outliers: 88% (severely inflated)
+
+benchmarking graphcolInstances/n20e26nc7_Single2.txt/OptimiseGC, + AC-3 
+time                 34.90 μs   (34.45 μs .. 35.49 μs)
+                     0.999 R²   (0.997 R² .. 1.000 R²)
+mean                 34.76 μs   (34.55 μs .. 35.10 μs)
+std dev              869.8 ns   (591.1 ns .. 1.524 μs)
+variance introduced by outliers: 24% (moderately inflated)
+
+Filename: graphcolInstances/n20e52nc7_Comps.txt
+Pre AC-3:        134
+Post AC-3:       129
+OptimiseGC:      128
+OptimiseGC AC-3: 118
+benchmarking graphcolInstances/n20e52nc7_Comps.txt/pre AC-3
+time                 28.04 μs   (27.61 μs .. 28.48 μs)
+                     0.998 R²   (0.998 R² .. 0.999 R²)
+mean                 27.97 μs   (27.64 μs .. 28.22 μs)
+std dev              939.7 ns   (792.1 ns .. 1.103 μs)
+variance introduced by outliers: 37% (moderately inflated)
+
+benchmarking graphcolInstances/n20e52nc7_Comps.txt/post AC-3
+time                 29.41 μs   (28.90 μs .. 29.96 μs)
+                     0.997 R²   (0.994 R² .. 0.999 R²)
+mean                 28.65 μs   (28.36 μs .. 29.34 μs)
+std dev              1.375 μs   (843.3 ns .. 2.354 μs)
+variance introduced by outliers: 55% (severely inflated)
+
+benchmarking graphcolInstances/n20e52nc7_Comps.txt/OptimiseGC, no AC-3
+time                 28.17 μs   (27.89 μs .. 28.54 μs)
+                     0.998 R²   (0.994 R² .. 1.000 R²)
+mean                 28.46 μs   (28.22 μs .. 29.10 μs)
+std dev              1.312 μs   (529.5 ns .. 2.359 μs)
+variance introduced by outliers: 53% (severely inflated)
+
+benchmarking graphcolInstances/n20e52nc7_Comps.txt/OptimiseGC, + AC-3 
+time                 83.95 μs   (82.76 μs .. 85.33 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 83.52 μs   (82.68 μs .. 84.92 μs)
+std dev              3.634 μs   (2.515 μs .. 5.813 μs)
+variance introduced by outliers: 46% (moderately inflated)
+
+Filename: graphcolInstances/n10e26nc3_Single1.txt
+Pre AC-3:        28
+Post AC-3:       23
+OptimiseGC:      28
+OptimiseGC AC-3: 23
+benchmarking graphcolInstances/n10e26nc3_Single1.txt/pre AC-3
+time                 7.821 μs   (7.771 μs .. 7.867 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 7.820 μs   (7.775 μs .. 7.867 μs)
+std dev              144.0 ns   (114.3 ns .. 185.9 ns)
+variance introduced by outliers: 17% (moderately inflated)
+
+benchmarking graphcolInstances/n10e26nc3_Single1.txt/post AC-3
+time                 7.137 μs   (7.048 μs .. 7.220 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 7.175 μs   (7.096 μs .. 7.246 μs)
+std dev              257.4 ns   (215.1 ns .. 302.6 ns)
+variance introduced by outliers: 45% (moderately inflated)
+
+benchmarking graphcolInstances/n10e26nc3_Single1.txt/OptimiseGC, no AC-3
+time                 7.788 μs   (7.734 μs .. 7.836 μs)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 7.847 μs   (7.797 μs .. 7.922 μs)
+std dev              212.5 ns   (133.3 ns .. 361.3 ns)
+variance introduced by outliers: 31% (moderately inflated)
+
+benchmarking graphcolInstances/n10e26nc3_Single1.txt/OptimiseGC, + AC-3 
+time                 21.01 μs   (20.84 μs .. 21.21 μs)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 21.21 μs   (21.09 μs .. 21.30 μs)
+std dev              326.6 ns   (268.1 ns .. 398.9 ns)
+variance introduced by outliers: 11% (moderately inflated)
+
+Filename: graphcolInstances/n20e26nc3_Single2.txt
+Pre AC-3:        58
+Post AC-3:       58
+OptimiseGC:      38
+OptimiseGC AC-3: 33
+benchmarking graphcolInstances/n20e26nc3_Single2.txt/pre AC-3
+time                 14.48 μs   (14.28 μs .. 14.77 μs)
+                     0.998 R²   (0.997 R² .. 1.000 R²)
+mean                 14.59 μs   (14.47 μs .. 14.79 μs)
+std dev              511.3 ns   (360.6 ns .. 724.9 ns)
+variance introduced by outliers: 41% (moderately inflated)
+
+benchmarking graphcolInstances/n20e26nc3_Single2.txt/post AC-3
+time                 12.25 μs   (12.10 μs .. 12.41 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 12.52 μs   (12.32 μs .. 12.88 μs)
+std dev              920.7 ns   (529.0 ns .. 1.515 μs)
+variance introduced by outliers: 76% (severely inflated)
+
+benchmarking graphcolInstances/n20e26nc3_Single2.txt/OptimiseGC, no AC-3
+time                 14.23 μs   (14.05 μs .. 14.43 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 14.28 μs   (14.16 μs .. 14.41 μs)
+std dev              391.0 ns   (317.2 ns .. 504.5 ns)
+variance introduced by outliers: 30% (moderately inflated)
+
+benchmarking graphcolInstances/n20e26nc3_Single2.txt/OptimiseGC, + AC-3 
+time                 28.35 μs   (28.09 μs .. 28.66 μs)
+                     0.999 R²   (0.999 R² .. 0.999 R²)
+mean                 28.17 μs   (27.89 μs .. 28.45 μs)
+std dev              945.2 ns   (717.7 ns .. 1.387 μs)
+variance introduced by outliers: 37% (moderately inflated)
+
+Filename: graphcolInstances/n20e52nc3_Comps.txt
+Pre AC-3:        58
+Post AC-3:       53
+OptimiseGC:      56
+OptimiseGC AC-3: 46
+benchmarking graphcolInstances/n20e52nc3_Comps.txt/pre AC-3
+time                 28.34 μs   (28.08 μs .. 28.62 μs)
+                     0.999 R²   (0.998 R² .. 0.999 R²)
+mean                 28.24 μs   (27.93 μs .. 28.59 μs)
+std dev              1.071 μs   (821.4 ns .. 1.715 μs)
+variance introduced by outliers: 43% (moderately inflated)
+
+benchmarking graphcolInstances/n20e52nc3_Comps.txt/post AC-3
+time                 28.82 μs   (28.32 μs .. 29.44 μs)
+                     0.998 R²   (0.997 R² .. 0.999 R²)
+mean                 29.09 μs   (28.72 μs .. 29.56 μs)
+std dev              1.424 μs   (1.149 μs .. 1.983 μs)
+variance introduced by outliers: 56% (severely inflated)
+
+benchmarking graphcolInstances/n20e52nc3_Comps.txt/OptimiseGC, no AC-3
+time                 28.73 μs   (28.36 μs .. 29.10 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 28.67 μs   (28.44 μs .. 28.90 μs)
+std dev              751.7 ns   (600.1 ns .. 919.5 ns)
+variance introduced by outliers: 27% (moderately inflated)
+
+benchmarking graphcolInstances/n20e52nc3_Comps.txt/OptimiseGC, + AC-3 
+time                 71.03 μs   (70.27 μs .. 71.68 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 70.56 μs   (69.98 μs .. 71.20 μs)
+std dev              2.072 μs   (1.573 μs .. 2.908 μs)
+variance introduced by outliers: 29% (moderately inflated)
+
+Filename: graphcolInstances/n10e40nc3_Neg.txt
+Pre AC-3:        28
+Post AC-3:       24
+OptimiseGC:      28
+OptimiseGC AC-3: 24
+benchmarking graphcolInstances/n10e40nc3_Neg.txt/pre AC-3
+time                 11.52 μs   (11.39 μs .. 11.65 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 11.55 μs   (11.46 μs .. 11.64 μs)
+std dev              292.9 ns   (239.7 ns .. 358.6 ns)
+variance introduced by outliers: 27% (moderately inflated)
+
+benchmarking graphcolInstances/n10e40nc3_Neg.txt/post AC-3
+time                 68.45 μs   (67.93 μs .. 69.11 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 68.61 μs   (68.15 μs .. 69.11 μs)
+std dev              1.531 μs   (1.226 μs .. 1.913 μs)
+variance introduced by outliers: 18% (moderately inflated)
+
+benchmarking graphcolInstances/n10e40nc3_Neg.txt/OptimiseGC, no AC-3
+time                 11.48 μs   (11.33 μs .. 11.63 μs)
+                     0.999 R²   (0.999 R² .. 1.000 R²)
+mean                 11.63 μs   (11.53 μs .. 11.73 μs)
+std dev              316.5 ns   (253.2 ns .. 408.1 ns)
+variance introduced by outliers: 30% (moderately inflated)
+
+benchmarking graphcolInstances/n10e40nc3_Neg.txt/OptimiseGC, + AC-3 
+time                 98.50 μs   (96.84 μs .. 100.1 μs)
+                     0.999 R²   (0.998 R² .. 1.000 R²)
+mean                 97.17 μs   (96.29 μs .. 97.88 μs)
+std dev              2.762 μs   (2.195 μs .. 3.585 μs)
+variance introduced by outliers: 26% (moderately inflated)
+
