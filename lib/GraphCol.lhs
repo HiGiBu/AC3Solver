@@ -287,8 +287,17 @@ testFiles = map ("graphcolInstances/"++)
    "n20e96nc20.txt", "n20e188nc6.txt", 
    "n25e110nc15.txt", "n25e134nc22.txt"]
 
+-- Specific files with loose vertices / 2 separate components
+testFilesComps :: [String]
+testFilesComps = map ("graphcolInstances/"++) 
+  ["n10e26nc7_Single1.txt", "n20e26nc7_Single2.txt", "n20e52nc7_Comps.txt"] 
+
+testFilesComps3 :: [String]
+testFilesComps3 = map ("graphcolInstances/"++) 
+  ["n10e26nc3_Single1.txt", "n20e26nc3_Single2.txt", "n20e52nc3_Comps.txt"] 
+
 benchmarkTests :: IO ()
-benchmarkTests = mapM_ runBenchmark testFiles
+benchmarkTests = mapM_ runBenchmark ["graphcolInstances/n10e40nc3_Neg.txt"]
 
 runBenchmark :: String -> IO () 
 runBenchmark filename = do
