@@ -72,12 +72,16 @@ main = hspec $ do
           )
     -}
     --findAllSolutions can get *very* slow...
-
+    it "Check if 0 is always the root of a tree in a list of components (for optimiseGC)" $ 
+      property (\gc -> let 
+          comps = components $ ac3ToGraph gc 
+          in any (\(Node r _) -> r == 0) comps
+        )
     it "optimiseGC does not affect whether GC has a solution" $ 
       property (\(GC inst) -> let 
       (GC betterI) = optimiseGC (GC inst)
       in findSolution inst == findSolution betterI )
-    
+
     {-
     it "any solution found after optimiseGC, should also have been possible before" $ 
       property (\(GC inst) -> let 

@@ -119,9 +119,11 @@ the search space.
 optimiseGC :: GraphCol -> GraphCol
 optimiseGC gc@(GC (AC3 c d)) = let  
   comps = components $ ac3ToGraph gc
-  -- if 0 is in the tree, we want to just keep 0. Else, we will take the root and 
-  -- (arbit.ly) assign it the colour 0, as it is in a separate component to 0.
-  dChanges = map (\t@(Node r _) -> if 0 `elem` t then 0 else r) comps
+  -- As far as I can find with the tests, if 0 is an element of a component, then
+  --  0 is at the root. (Assuming a normal, legal GC instance of course). 
+  -- We assume this is the case. For each component, we assign the reduced domain [0]
+  -- to the root, thereby reducing the search space.
+  dChanges = map (\(Node r _) -> r) comps
   in GC (AC3 c (map (\(a,b) -> if a `elem` dChanges then (a,[0]) else (a,b)) d))
 
 
@@ -297,7 +299,7 @@ testFilesComps3 = map ("graphcolInstances/"++)
   ["n10e26nc3_Single1.txt", "n20e26nc3_Single2.txt", "n20e52nc3_Comps.txt"] 
 
 benchmarkTests :: IO ()
-benchmarkTests = mapM_ runBenchmark ["graphcolInstances/n10e40nc3_Neg.txt"]
+benchmarkTests = mapM_ runBenchmark $ testFiles ++ testFilesComps ++ testFilesComps3 ++ ["graphcolInstances/n10e40nc3_Neg.txt"]
 
 runBenchmark :: String -> IO () 
 runBenchmark filename = do
