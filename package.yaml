@@ -19,6 +19,7 @@ dependencies:
   - template-haskell
   - graphite
   - criterion
+  - time
 
 library:
   source-dirs: lib
