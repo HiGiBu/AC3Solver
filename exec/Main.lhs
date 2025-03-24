@@ -10,7 +10,6 @@ module Main where
 import Text.Read (readMaybe)
 
 import GraphCol
-import Knapsack
 import Scheduling
 import Sudoku
 import NQueens
