@@ -29,20 +29,47 @@ We use the listings package to typeset Haskell source code nicely.
 % \input{Howto.tex}
 
 \section{Introduction}
-TODO: What is AC-3, why use it (etc)...
+% DONE: What is AC-3, why use it (etc)...
+Many problems in computer science can be written as a set of possible values for each 
+body in the problem instance, and a set of restrictions, or constraints, between pairs of bodies.
+Using this method, we can then define such an instance as a graph, where each vertex has a set of possible values, or domain,
+and where each edge between two vertices is a restriction.  
 
-AC-3 paper: \cite{AC3}
+This was the basis behind the arc consistency algorithms discussed in~\cite{AC3}, including the AC-3 algorithm 
+we use in our implementation. 
+This algorithm aims to efficiently iterate over all of the constraints, and remove any values for which the constraints is invalidated.
 
-TODO: Add a note that AC-3 cannot \emph{solve} -> See Dennis' example, now in ac3Tests.lhs
+Take as an example X with domain $[1,2]$ and Y with domain $[2,3]$, with an edge connecting them representing the contraint $(==)$.
+The AC-3 algorithm will remove the value $1$ from X's domain and the value $3$ from Y's domain, 
+as there is no value in the other body's domain such that the constraint is true for $X=1$ or $Y=3$.
 
-\section{The skeleton files}
+% AC-3 paper: \cite{AC3}
+
+% DONE: Add a note that AC-3 cannot \emph{solve} -> See Dennis' example, now in ac3Tests.lhs
+% TODO: Add a visual graph?
+Notably, AC-3 cannot \emph{solve} problems. As an example, take 3 entities $X,Y,Z$, 
+each with domain $[0,1]$, and with edges $(/=)$ between each. 
+The AC-3 algorithm does not purge any values. For each value, the other entities have a 
+value for which the constraint holds.
+However, if we try to find a solution with backtracking, we find that no solution exists, as 
+the three entities need to all have a unique value. 
+
+As such, AC-3's main purpose is to reduce the search space, by pruning values for which no
+ solution can exist. If at least one vertex has no possible values, then there is no solution.
+Else, we can use backtracking to determine if a solution exists, and if so what said solution is.
+
+We discuss our AC-3 and backtracking implementation in Section~\ref{sec:skeleton}. 
+We then introduce a number of different computer science problems in Section~\ref{sec:problems}, and show how our implementation
+attempts to solve them. 
+
+\section{The skeleton files}\label{sec:skeleton}
 These files form the basis of our implementation, which we then use to solve various problems.
 
 \input{lib/AC3Solver.lhs}
 
 \input{lib/Backtracking.lhs}
 
-\section{The problem files} % TODO: Maybe a better name for this?
+\section{The problem files}\label{sec:problems} % TODO: Maybe a better name for this?
 
 \input{lib/NQueens.lhs}
 
