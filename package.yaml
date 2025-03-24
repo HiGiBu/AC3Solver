@@ -55,3 +55,14 @@ tests:
       - report
       - QuickCheck
       - hspec
+    
+benchmarks:
+  bench-graphcol:
+    source-dirs: benchmark
+    main: graphBench.lhs
+    other-modules: GraphColExamples
+    dependencies:
+      - report
+      - QuickCheck
+      - hspec
+      - criterion
