@@ -17,6 +17,7 @@ import Criterion.Main
 import Data.Char (toUpper)
 import Data.Graph
 --import Data.Graph.Read
+import Data.Maybe
 import Data.List
 import Text.Read (readMaybe)
 import Test.QuickCheck
@@ -326,5 +327,32 @@ runBenchmark filename = do
                     , bench "OptimiseGC, + AC-3 " $ whnf (\(GC oi) -> findSolution (AC3 (cons inst) (ac3 oi))) (optimiseGC gc)
                     ]
     ]
+
+\end{code}
+\hide{
+\begin{code}
+-- src: https://hackage.haskell.org/package/safe-0.3.21/docs/Safe.html#v:lookupJust
+lookupJust :: (Eq a) => a -> [(a, b)] -> b 
+lookupJust key = fromJust . lookup key
+\end{code}
+}
+
+\begin{code}
+
+-- | Given a graph, we want to duplicate it so that we have 2 components, 
+-- | where every vertices 1,3,... form 1 copy of the graph, and 0,2,4.. the other
+duplicateGraph :: Graph -> Graph 
+duplicateGraph g = let 
+  mappingEven = zip (vertices g) [0 :: Int, 2..]
+  mappingOdd = zip (vertices g) [1 :: Int, 3..]
+  newVcount = 2*length (vertices g)  - 1
+  newEdges = concatMap (\(a,b) -> [ (lookupJust a mappingEven, lookupJust b mappingEven) ,  (lookupJust a mappingOdd, lookupJust b mappingOdd)]) (edges g)
+  in buildG (0, newVcount) newEdges
+
+
+
+
+
+
 
 \end{code}
