@@ -50,11 +50,13 @@ seqPair (ma, mb) = ma >>= \a -> mb >>= \b -> return (a,b)
 instance Arbitrary GraphCol where 
     arbitrary = sized arbitGraphColN where 
         arbitGraphColN n = do 
-            nColours <- choose (1, max (n `div` 4) 1) -- we require n to be > 0 
+            nColours <- chooseInt (1, max (n `div` 4) 1) -- we require n to be > 0 
+            --nColours <- chooseInt (2, max (n `div` 4) 2)
             sizeV <- choose (0, n `div` 3) -- we make vertices 0..sizeV INCLUDING SIZEV!
-            let eMax = max sizeV $ (sizeV*(sizeV-1)) `div` 3
-            sizeE <- choose (sizeV, eMax)
-            e <- sequence [seqPair (choose (0, sizeV), choose (0, sizeV)) | _<-[0..sizeE]]
+            --let sizeV = 100
+            let eMax = max sizeV $ (sizeV*(sizeV-1)) `div` 4
+            sizeE <- chooseInt (sizeV, eMax)
+            e <- sequence [seqPair (chooseInt (0, sizeV), chooseInt (0, sizeV)) | _<-[0..sizeE]]
             -- we do not want edges (x,x), nor do we want repeat edges
             let nonReflE = nub $ filter (uncurry (/=)) e
             let g = buildG (0, sizeV) nonReflE
