@@ -32,15 +32,16 @@ We use the listings package to typeset Haskell source code nicely.
 % DONE: What is AC-3, why use it (etc)...
 Many problems in computer science can be written as a set of possible values for each 
 body in the problem instance, and a set of restrictions, or constraints, between pairs of bodies.
-Using this method, we can then define such an instance as a graph, where each vertex has a set of possible values, or domain,
-and where each edge between two vertices is a restriction.  
+Using this method, we can then define a problem instance as a graph, where each vertex has a set of possible values, or domain,
+and where each edge between two vertices is a constraint.  
 
-This was the basis behind the arc consistency algorithms discussed in~\cite{AC3}, including the AC-3 algorithm 
+This forms the basis behind the arc consistency algorithms discussed in~\cite{AC3}, including the AC-3 algorithm 
 we use in our implementation. 
-This algorithm aims to efficiently iterate over all of the constraints, and remove any values for which the constraints is invalidated.
+The AC-3 algorithm aims to efficiently iterate over all of the constraints, 
+and remove any values for which the constraints is invalidated.
 
-Take as an example X with domain $[1,2]$ and Y with domain $[2,3]$, with an edge connecting them representing the contraint $(==)$.
-The AC-3 algorithm will remove the value $1$ from X's domain and the value $3$ from Y's domain, 
+Take as an example $X$ with domain $[1,2]$ and $Y$ with domain $[2,3]$, with an edge connecting them representing the contraint \verb:(==):.
+The AC-3 algorithm will remove the value $1$ from $X$'s domain and the value $3$ from $Y$'s domain, 
 as there is no value in the other body's domain such that the constraint is true for $X=1$ or $Y=3$.
 
 % AC-3 paper: \cite{AC3}
@@ -48,7 +49,7 @@ as there is no value in the other body's domain such that the constraint is true
 % DONE: Add a note that AC-3 cannot \emph{solve} -> See Dennis' example, now in ac3Tests.lhs
 % TODO: Add a visual graph?
 Notably, AC-3 cannot \emph{solve} problems. As an example, take 3 entities $X,Y,Z$, 
-each with domain $[0,1]$, and with edges $(/=)$ between each. 
+each with domain $[0,1]$, and with edges \verb:(/=): between each. 
 The AC-3 algorithm does not purge any values. For each value, the other entities have a 
 value for which the constraint holds.
 However, if we try to find a solution with backtracking, we find that no solution exists, as 
@@ -88,7 +89,7 @@ These files form the basis of our implementation, which we then use to solve var
 \input{test/ac3Tests.lhs}
 
 \input{Conclusion.tex}
-\input{Future works??}
+\section{Future works??}
 
 \addcontentsline{toc}{section}{Bibliography}
 \bibliographystyle{alpha}
