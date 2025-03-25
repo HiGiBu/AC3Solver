@@ -10,7 +10,9 @@ import AC3Solver
 import Backtracking
 import GraphCol (GraphCol(GC), optimiseGC, readGraphFromFile, duplicateGraph, convertGraphToAC3, ac3ToGraph)
 
-import GraphColExamples -- File that contains the (very big) GC example instances
+-- ! NOTE: DO NOT IMPORT BOTH AT THE SAME TIME, AS THIS MAY NOT COMPILE.
+--import GraphColExamples -- File that contains the (very big) GC example instances
+import GraphColExamples2 -- Second file that contains the (very big) GC example instances
 
 -- A method to note the difference before & after running AC3.
 getTotalDomainOptions :: [Domain a b] -> Int 

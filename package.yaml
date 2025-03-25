@@ -61,7 +61,8 @@ benchmarks:
     source-dirs: benchmark
     main: graphBench.lhs
     other-modules: 
-      - GraphColExamples
+      # Note: we can only import one of these at a time, due to their size...
+      # - GraphColExamples
       - GraphColExamples2
     dependencies:
       - report
