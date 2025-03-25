@@ -60,7 +60,9 @@ benchmarks:
   bench-graphcol:
     source-dirs: benchmark
     main: graphBench.lhs
-    other-modules: GraphColExamples
+    other-modules: 
+      - GraphColExamples
+      - GraphColExamples2
     dependencies:
       - report
       - QuickCheck
