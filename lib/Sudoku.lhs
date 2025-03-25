@@ -10,6 +10,7 @@ import Text.Printf ( printf )
 import AC3Solver ( AC3 (..), ac3, ConstraintAA, Domain )
 import Backtracking ( findSolution )
 \end{code}
+\subsection{The Sudoku Library}\label{sec:sudoku}
 
 This file implements Sudoku in a suitable format for our AC3 and backtracking algorithms.
 
@@ -20,10 +21,11 @@ In our formulation:
    - Each agent maintains a domain of possible values $[1-9]$
 
 2. Sudoku's rules are encoded as binary constraints between agents:
-   - \textbf{Row constraint}: All cells in the same row must contain different values
-   - \textbf{Column constraint}: All cells in the same column must contain different values
-   - \textbf{Box constraint}: All cells in the same 3-by-3 box must contain different values
-
+\begin{itemize}
+    \item \textbf{Row constraint}: All cells in the same row must contain different values
+    \item \textbf{Column constraint}: All cells in the same column must contain different values
+    \item \textbf{Box constraint}: All cells in the same 3-by-3 box must contain different values
+\end{itemize}
 These constraints are implemented as inequality relations ($\neq$) between cells. For instance, cell $(3,2)$ 
 and cell $(3,7)$ are in the same row, thus, a constraint is added to ensure that they do not have the same value.
 
@@ -176,10 +178,9 @@ runAC3OnSudokuFile fileName = do
     return reducedPuzzle
 \end{code}
 
-The reduction in domain size from running AC3 varies between puzzles. Easier puzzles can experience a reduction of more
-than $50$\%, while harder puzzles are more like $40$\%. However, only getting the domain reduction is unsatisfactory,
-we want a solution to the sudoku as well. The following function does just that by running the backtracking algorithm
-over the AC3 reduced puzzle.
+The reduction in domain size from running AC3 varies between puzzles, easier puzzles experience greater reduction than
+harder puzzles. However, only getting the domain reduction is unsatisfactory, we want a solution to the sudoku as well. 
+The following function does just that by running the backtracking algorithm over the AC3 reduced puzzle.
 
 \begin{code}
 solveSudokuFromFile :: String -> IO ()
@@ -201,57 +202,96 @@ solveSudokuFromFile fileName = do
             printSudokuPuzzle solvedPuzzle
 \end{code}
 
-
+With these function we can define the main loop that the user interacts with. It asks the user to choose a sudoku puzzle, and then runs AC3 and backtracking on it.
+The user can choose between easy, hard, and special puzzles. Easy and hard puzzles are chosen by number, while special puzzles are chosen by name. Each of these
+three cases are considered, and the user is prompted to choose again if an invalid choice is made.
 
 \begin{code}
-solveSudokuFromFileSilent :: String -> IO ()
-solveSudokuFromFileSilent fileName = do
-    puzzle <- loadSudokuPuzzle fileName         
-    let ac3Domain = ac3 puzzle
-    let ac3Puzzle = AC3 sudokuConstraints ac3Domain
-    let solutions = findSolution ac3Puzzle
-    let solvedDomain = case solutions of
-                  Nothing -> []  -- No solution found
-                  Just assignments -> [((row, col), [number]) | ((row, col), number) <- assignments]
+
+sudokuMain :: IO ()
+sudokuMain = do
+    showWelcomeMessage
+
+    putStr "Choose your difficulty: \n\
+         \  (1) easy\n\
+         \  (2) hard\n\
+         \  (3) special\n"
     
-    if null solvedDomain then putStrLn "No solution found"
+    putStr "\nSelect one of (1, 2, 3): "
+    diff <- getLine
+
+    fileName <- case diff of
+
+        -- | Easy puzzle case
+        "1" -> do getEasyPuzzle where -- | Start the recursive prompt
+            getEasyPuzzle = do
+                putStr "Choose a puzzle number between 1 and 50: "
+                puzzleNum <- getLine
+                -- Check if input is a valid number in range
+                case reads puzzleNum :: [(Int, String)] of
+                    [(num, "")] | num >= 1 && num <= 50 -> 
+                        return ("easy" ++ puzzleNum)
+                    _ -> do
+                        putStrLn $ "Invalid choice. Please enter a number between 1 and 50."
+                        getEasyPuzzle -- | Try again
+
+        -- | Hard puzzle case
+        "2" -> do getHardPuzzle where -- | Start the recursive prompt
+            getHardPuzzle = do
+                    putStr "Choose a puzzle number between 1 and 95: "
+                    puzzleNum <- getLine
+                    -- Check if input is a valid number in range
+                    case reads puzzleNum :: [(Int, String)] of
+                        [(num, "")] | num >= 1 && num <= 95 -> 
+                            return ("hard" ++ puzzleNum)
+                        _ -> do
+                            putStrLn $ "Invalid choice. Please enter a number between 1 and 95."
+                            getHardPuzzle -- | Try again
+        
+        -- | Special puzzle case
+        "3" -> do askForSpecialPuzzle where -- | Start the recursive prompt
+            askForSpecialPuzzle = do
+                putStr "Choose a puzzle: \n\
+                    \  (1) impossible\n\
+                    \  (2) Mirror\n\
+                    \  (3) Times1\n"
+                
+                putStr "\nSelect one of (1, 2, 3): "
+                puzzleName <- getLine
+                case puzzleName of
+                    "1" -> return "impossible"
+                    "2" -> return "Mirror"
+                    "3" -> return "Times1"
+                    _   -> do
+                        putStrLn $ "Sorry, " ++ show puzzleName ++ " is not a valid choice. Please try again."
+                        askForSpecialPuzzle -- | Try again
+        
+        -- | Invalid choice
+        x -> do
+            putStrLn $ "Sorry, " ++ show x ++ " is not a valid choice. Please try again."
+            sudokuMain  -- | Restart if invalid choice
+            return ""   -- | This line is dealt with below
+
+    if null fileName then return () -- | fileName is null after user executes case x, but the program has already successfully run
     else do
-        putStrLn "Solved puzzle!"
+        -- | Solve the Sudoku puzzle from the file
+        putStrLn $ "\nSolving Sudoku puzzle " ++ fileName ++ "..."
+        solveSudokuFromFile fileName
 
-
-
-solveSudokuFromFileNOAC3 :: String -> IO ()
-solveSudokuFromFileNOAC3 fileName = do -- 11:36 not by 11:56
-    puzzle <- loadSudokuPuzzle fileName       
-    putStrLn "Initial puzzle"
-    printSudokuPuzzle puzzle
-
-    putStrLn "Running backtracking..."          -- | Run backtracking to find a solution
-    let solutions = findSolution puzzle
-
-    let solvedDomain = case solutions of        -- | Check for solutions, extract solved domain if found
-                  Nothing -> []                 -- | No solution found
-                  Just assignments -> [((row, col), [number]) | ((row, col), number) <- assignments]
-    
-    if null solvedDomain 
-        then putStrLn "No solution was found"
-        else do
-            let solvedPuzzle = AC3 sudokuConstraints solvedDomain
-            putStrLn "Solved puzzle:"
-            printSudokuPuzzle solvedPuzzle
-
-
-
-
--- Compute the average domain size before and after running AC3
--- computeReductionFromFile :: String -> IO (Float, Float)
--- computeReductionFromFile fileName = do
---    puzzle <- loadSudokuPuzzle fileName
---    return (computeDomainReduction puzzle)
+-- | Display welcome banner
+showWelcomeMessage :: IO ()
+showWelcomeMessage = do
+    putStrLn "------------------------------------------" 
+    putStrLn "|            WELCOME TO THE              |"
+    putStrLn "|           SUDOKU AC3 SOLVER            |"
+    putStrLn "------------------------------------------"
+    putStrLn ""
 
 \end{code}
 
-The code above relied on some pretty-printing and reduction computation, which are defined below.
+\hide{
+
+The code above relied on some pretty-printing and domain size reduction, which are defined below.
 
 \begin{code}
 
@@ -297,6 +337,7 @@ printSudokuSolution puzzle = do
 
 \end{code}
 
+
 \begin{code}
 
 -- Compute the amount of reduction in domain size before and after applying AC-3
@@ -309,89 +350,11 @@ computeDomainReduction oldDomain newDomain = (printf "%.2f" oldSizeAverage, prin
     oldSizeAverage = fromIntegral oldSize / 81 :: Float
     newSizeAverage = fromIntegral newSize / 81 :: Float
 
-
--- computeDomainReduction :: AC3 (Int, Int) Int -> (Float, Float)
--- computeDomainReduction puzzle = (fromIntegral originalSize/81, fromIntegral reducedSize/81)
---  where
---    originalSize = sum (map length (getDomains puzzle))
---    reducedSize = sum (map (length . snd) (ac3 puzzle)) -- Using AC-3 algorithm to reduce the domains
-
-
-
 -- Extract the domains of each cell from a sudoku puzzle
 getDomains :: AC3 (Int, Int) Int -> [[Int]]
 getDomains (AC3 _cons dom) = map snd dom
 
 \end{code}
-
-
-
-\begin{code}
-
-sudokuMain :: IO ()
-sudokuMain = do
-    showWelcomeMessage
-
-    putStr "Choose your difficulty: \n\
-         \  (1) easy\n\
-         \  (2) hard\n\
-         \  (3) special\n"
-    
-    putStr "\nSelect one of (1, 2, 3): "
-    diff <- getLine
-
-    fileName <- case diff of
-        "1" -> do
-            putStr "Choose a puzzle number between 1 and 50: "
-            puzzleNum <- getLine
-            return ("easy" ++ puzzleNum)
-            
-        "2" -> do
-            putStr "Choose a puzzle number between 1 and 95: "
-            puzzleNum <- getLine
-            return ("hard" ++ puzzleNum)
-            
-        "3" -> do
-            putStr "Choose a puzzle: \n\
-                \  (1) impossible\n\
-                \  (2) Mirror\n\
-                \  (3) Times1\n"
-            putStr "\nYour choice: "
-            puzzleName <- getLine
-            return $ case puzzleName of
-                "1" -> "impossible"
-                "2" -> "Mirror"
-                "3" -> "Times1"
-                _   -> "impossible"
-                
-        _ -> do
-            putStrLn "Invalid choice. Please try again."
-            sudokuMain  -- Restart if invalid choice
-            return ""   -- This line is never reached but needed for type checking
-
-    -- Print the initial puzzle and the result after applying AC3
-    putStr $ "\nSolving Sudoku puzzle " ++ fileName ++ "...\n"
-
-   -- (beforeAC3, afterAC3) <- computeReductionFromFile fileName
-   -- putStrLn "The average domain size:"
-   -- putStrLn $ "    Before AC3: " ++ show beforeAC3
-   -- putStrLn $ "    After AC3: " ++ show afterAC3
-
-    -- Solve the Sudoku puzzle from the file
-    solveSudokuFromFile fileName
-    
--- Display welcome banner
-showWelcomeMessage :: IO ()
-showWelcomeMessage = do
-    putStrLn "------------------------------------------" 
-    putStrLn "|           SUDOKU AC3 SOLVER            |"
-    putStrLn "------------------------------------------"
-    putStrLn ""
-
-
-\end{code}
-
-
 
 Benchmarking the speed of solving sudoku puzzles with AC3 + backtracking VS. only backtracking.
 
@@ -405,3 +368,102 @@ timeAC3 fileName = do
     putStrLn $ "Time taken: " ++ show (diffUTCTime end start)
 
 \end{code}
+
+
+\begin{code}
+solveSudokuFromFileSilent :: String -> IO ()
+solveSudokuFromFileSilent fileName = do
+    puzzle <- loadSudokuPuzzle fileName         
+    let ac3Domain = ac3 puzzle
+    let ac3Puzzle = AC3 sudokuConstraints ac3Domain
+    let solutions = findSolution ac3Puzzle
+    let solvedDomain = case solutions of
+                  Nothing -> []  -- No solution found
+                  Just assignments -> [((row, col), [number]) | ((row, col), number) <- assignments]
+    
+    if null solvedDomain then putStrLn "No solution found"
+    else do
+        putStrLn "Solved puzzle!"
+
+-- | Silent version that runs AC3 on a file
+runAC3OnSudokuFileSilent :: String -> IO (String, String, [[Int]], [[Int]])
+runAC3OnSudokuFileSilent fileName = do
+    puzzle <- loadSudokuPuzzle fileName         -- | Load sudoku puzzle from file name         
+    -- putStrLn "Initial puzzle:"
+    -- printSudokuPuzzle puzzle                    -- | Display the initial puzzle
+
+    -- putStrLn "Running AC3..."                   -- | Run AC3 and create a new puzzle with reduced domains
+    let reducedDomain = ac3 puzzle
+    let reducedPuzzle = AC3 sudokuConstraints reducedDomain
+
+    let oldDomain = getDomains puzzle           -- | Display the average domain size before and after running AC3
+    let newDomain = getDomains reducedPuzzle
+    let (beforeAC3, afterAC3) = computeDomainReduction oldDomain newDomain
+    
+    -- putStrLn "Average domain size"
+    -- putStrLn $ "    Before AC3: " ++ beforeAC3
+    -- putStrLn $ "    After AC3:  " ++ afterAC3
+
+    -- | Return the old and new domains instead
+    return (beforeAC3, afterAC3, oldDomain, newDomain)
+
+
+solveSudokuFromFileNOAC3 :: String -> IO ()
+solveSudokuFromFileNOAC3 fileName = do
+    puzzle <- loadSudokuPuzzle fileName       
+    putStrLn "Initial puzzle"
+    printSudokuPuzzle puzzle
+
+    putStrLn "Running backtracking..."          -- | Run backtracking to find a solution
+    let solutions = findSolution puzzle
+
+    let solvedDomain = case solutions of        -- | Check for solutions, extract solved domain if found
+                  Nothing -> []                 -- | No solution found
+                  Just assignments -> [((row, col), [number]) | ((row, col), number) <- assignments]
+    
+    if null solvedDomain 
+        then putStrLn "No solution was found"
+        else do
+            let solvedPuzzle = AC3 sudokuConstraints solvedDomain
+            putStrLn "Solved puzzle:"
+            printSudokuPuzzle solvedPuzzle
+
+\end{code}
+
+This code was used to conduct the domain reduction experiment.
+
+\begin{code}
+
+easyFiles :: [[Char]]
+easyFiles = ["easy" ++ show i | i <- [1..50 :: Integer]]
+
+hardFiles :: [[Char]]
+hardFiles = ["hard" ++ show i | i <- [1..95 :: Integer]]
+
+domainReductionExperimentEasy :: IO ()
+domainReductionExperimentEasy = do
+    results <- mapM runAC3OnSudokuFileSilent easyFiles
+
+    -- | Extract the old and new (before and after AC3) average domain sizes
+    let oldAvgDomains = map (\(old, _, _, _) -> read old :: Float) results
+    let newAvgDomains = map (\(_, new, _, _) -> read new :: Float) results
+
+    print oldAvgDomains
+    print newAvgDomains
+
+domainReductionExperimentHard :: IO ()
+domainReductionExperimentHard = do
+    results <- mapM runAC3OnSudokuFileSilent hardFiles
+
+    -- | Extract the old and new (before and after AC3) average domain sizes
+    let oldAvgDomains = map (\(old, _, _, _) -> read old :: Float) results
+    let newAvgDomains = map (\(_, new, _, _) -> read new :: Float) results
+
+    print oldAvgDomains
+    print newAvgDomains
+
+
+\end{code}
+
+
+}
