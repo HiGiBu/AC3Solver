@@ -1,0 +1,67 @@
+Filename: example_N499_AC3_gc
+Pre AC-3:        1495
+Post AC-3:       1315
+OptimiseGC:      1495
+OptimiseGC AC-3: 1315
+Filename: example_N998_AC3_gc
+Pre AC-3:        2992
+Post AC-3:       2812
+OptimiseGC:      2990
+OptimiseGC AC-3: 2630
+
+benchmarking example_N499_AC3_gc/pre AC-3
+time                 322.1 ms   (316.9 ms .. 324.9 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 327.1 ms   (324.6 ms .. 329.7 ms)
+std dev              3.273 ms   (1.941 ms .. 4.629 ms)
+variance introduced by outliers: 16% (moderately inflated)
+                    
+benchmarking example_N499_AC3_gc/post AC-3
+time                 898.8 ms   (871.6 ms .. 912.1 ms)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 902.3 ms   (899.1 ms .. 905.5 ms)
+std dev              3.974 ms   (2.052 ms .. 5.091 ms)
+variance introduced by outliers: 19% (moderately inflated)
+                    
+benchmarking example_N499_AC3_gc/OptimiseGC, no AC-3
+time                 316.7 ms   (306.4 ms .. 329.8 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 324.9 ms   (321.1 ms .. 327.7 ms)
+std dev              4.491 ms   (3.325 ms .. 5.602 ms)
+variance introduced by outliers: 16% (moderately inflated)
+                    
+benchmarking example_N499_AC3_gc/OptimiseGC, + AC-3 
+time                 2.288 s    (2.208 s .. 2.368 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 2.293 s    (2.272 s .. 2.322 s)
+std dev              27.67 ms   (12.87 ms .. 35.21 ms)
+variance introduced by outliers: 19% (moderately inflated)
+                    
+                    
+benchmarking example_N998_AC3_gc/pre AC-3
+time                 133.6 s    (132.2 s .. 134.9 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 133.0 s    (132.7 s .. 133.3 s)
+std dev              378.2 ms   (187.3 ms .. 448.3 ms)
+variance introduced by outliers: 19% (moderately inflated)
+                    
+benchmarking example_N998_AC3_gc/post AC-3
+time                 691.7 ms   (667.0 ms .. 730.5 ms)
+                     1.000 R²   (0.999 R² .. 1.000 R²)
+mean                 703.2 ms   (697.9 ms .. 712.2 ms)
+std dev              8.693 ms   (963.9 μs .. 11.37 ms)
+variance introduced by outliers: 19% (moderately inflated)
+                    
+benchmarking example_N998_AC3_gc/OptimiseGC, no AC-3
+time                 44.69 s    (44.44 s .. 44.90 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 44.64 s    (44.57 s .. 44.69 s)
+std dev              63.09 ms   (25.02 ms .. 77.85 ms)
+variance introduced by outliers: 19% (moderately inflated)
+                    
+benchmarking example_N998_AC3_gc/OptimiseGC, + AC-3 
+time                 6.159 s    (6.058 s .. 6.303 s)
+                     1.000 R²   (1.000 R² .. 1.000 R²)
+mean                 6.202 s    (6.167 s .. 6.240 s)
+std dev              42.23 ms   (18.49 ms .. 58.95 ms)
+variance introduced by outliers: 19% (moderately inflated)
