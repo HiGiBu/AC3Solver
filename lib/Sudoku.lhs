@@ -9,6 +9,7 @@ import Text.Printf ( printf )
 -- Import AC3 solver and backtracking algorithm
 import AC3Solver ( AC3 (..), ac3, ConstraintAA, Domain )
 import Backtracking ( findSolution )
+
 \end{code}
 \subsection{The Sudoku Library}\label{sec:sudoku}
 
@@ -289,6 +290,15 @@ showWelcomeMessage = do
 
 \end{code}
 
+
+
+
+
+
+
+
+
+
 \hide{
 
 The code above relied on some pretty-printing and domain size reduction, which are defined below.
@@ -373,17 +383,18 @@ timeAC3 fileName = do
 \begin{code}
 solveSudokuFromFileSilent :: String -> IO ()
 solveSudokuFromFileSilent fileName = do
-    puzzle <- loadSudokuPuzzle fileName         
+    puzzle <- loadSudokuPuzzle fileName    
+    start <- getCurrentTime         -- | Start timer     
     let ac3Domain = ac3 puzzle
     let ac3Puzzle = AC3 sudokuConstraints ac3Domain
     let solutions = findSolution ac3Puzzle
     let solvedDomain = case solutions of
                   Nothing -> []  -- No solution found
                   Just assignments -> [((row, col), [number]) | ((row, col), number) <- assignments]
-    
     if null solvedDomain then putStrLn "No solution found"
     else do
-        putStrLn "Solved puzzle!"
+        end <- getCurrentTime       -- | End timer
+        putStrLn $ "Solved puzzle: " ++ show fileName ++ " in " ++ show (diffUTCTime end start)
 
 -- | Silent version that runs AC3 on a file
 runAC3OnSudokuFileSilent :: String -> IO (String, String, [[Int]], [[Int]])
@@ -428,6 +439,18 @@ solveSudokuFromFileNOAC3 fileName = do
             putStrLn "Solved puzzle:"
             printSudokuPuzzle solvedPuzzle
 
+-- | Solving a few easy puzzles with AC3 and measuring the time
+easyFiles' :: [[Char]]
+easyFiles' = ["easy" ++ show i | i <- [1, 43, 32, 12, 44, 3, 22, 13, 34, 45:: Integer]]
+
+solvingEasyPuzzlesExperiment :: IO [()]
+solvingEasyPuzzlesExperiment = do
+    mapM solveSudokuFromFileSilent easyFiles'
+    
+hardFiles' :: [[Char]]
+hardFiles' = ["hard" ++ show i | i <- [75, 92, 38, 34, 64, 78, 96, 56, 53, 12:: Integer]]
+
+
 \end{code}
 
 This code was used to conduct the domain reduction experiment.
@@ -462,6 +485,25 @@ domainReductionExperimentHard = do
     print oldAvgDomains
     print newAvgDomains
 
+domainCombinationsExperiment :: String -> IO ()
+domainCombinationsExperiment fileName = do
+    (_, _, oldDomains, newDomains) <- runAC3OnSudokuFileSilent fileName
+    
+    putStrLn "Old domains number of combinations:"
+    printNumberofCombinations oldDomains
+    putStrLn "New domains number of combinations:"
+    printNumberofCombinations newDomains
+    where
+        printNumberofCombinations domains' = do
+            let a = map length domains'
+            let logProduct = sum $ map (logBase 10 . fromIntegral) a :: Float
+            let flooredValue = floor logProduct :: Int
+            putStrLn $ "Total combinations: approximately 10^" ++ show flooredValue
+
+runDomainCombinationsExperiment :: IO ()
+runDomainCombinationsExperiment = do
+    mapM_ domainCombinationsExperiment easyFiles
+    -- mapM_ domainCombinationsExperiment hardFiles
 
 \end{code}
 
