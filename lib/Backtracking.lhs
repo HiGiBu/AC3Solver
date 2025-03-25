@@ -114,7 +114,7 @@ elemAs y ((x,_):as) = x==y || y `elemAs` as
 -- Find agent Y's assigned value
 -- PRE: y \in as.
 valY :: Eq a => Agent a -> [Assignment a b] -> b 
-valY _ [] = undefined -- should not happen.
+valY _ [] = error "Y's value could not be found in the assignment." -- should not happen.
 valY y ((x,b):as) = if x == y then b else valY y as
 
 

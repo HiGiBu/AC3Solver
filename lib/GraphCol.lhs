@@ -9,14 +9,12 @@ We are asked to assign a colour $0..(n-1)$ to each vertex, where for each edge $
 $u$ and $v$ have different colours. 
 
 \begin{code}
---{-# LANGUAGE LambdaCase #-} -- todo remove? if not using data.graph.read...
 module GraphCol where
 
 import Control.Monad (when, foldM_)
 import Criterion.Main
 import Data.Char (toUpper)
 import Data.Graph
---import Data.Graph.Read
 import Data.Maybe
 import Data.List
 import Text.Read (readMaybe)
@@ -46,24 +44,26 @@ newtype GraphCol = GC (AC3 Vertex Int)
 seqPair :: (Gen a, Gen a) -> Gen (a,a)
 seqPair (ma, mb) = ma >>= \a -> mb >>= \b -> return (a,b) 
 
--- (Seems graphs don't already have an arbitrary instance...)
+-- It appears that Haskell graphs do not already have an arbitrary instance.
 instance Arbitrary GraphCol where 
     arbitrary = sized arbitGraphColN where 
         arbitGraphColN n = do 
             nColours <- chooseInt (1, max (n `div` 4) 1) -- we require n to be > 0 
             --nColours <- chooseInt (2, max (n `div` 4) 2)
             sizeV <- choose (0, n `div` 3) -- we make vertices 0..sizeV INCLUDING SIZEV!
-            --let sizeV = 100
+            --let sizeV = 498
             let eMax = max sizeV $ (sizeV*(sizeV-1)) `div` 4
             sizeE <- chooseInt (sizeV, eMax)
             e <- sequence [seqPair (chooseInt (0, sizeV), chooseInt (0, sizeV)) | _<-[0..sizeE]]
-            -- we do not want edges (x,x), nor do we want repeat edges
+            -- we do not want edges (x,x), nor do we want repeat edges.
             let nonReflE = nub $ filter (uncurry (/=)) e
             let g = buildG (0, sizeV) nonReflE
             return $ convertGraphToAC3 g nColours --return $ convertGraphToAC3 g n
 
+-- | We require show to use the arbritary instance above in QuickCheck.
+-- | Note that we cannot actually check that each constraint is a (/=), we must 
+-- | assume it to be so.
 instance Show GraphCol where 
-  --show :: GraphCol -> String 
   show (GC (AC3 c d)) = let 
     strCon = "[" ++ makeShow c ++ "]" where 
       makeShow [] = ""
@@ -82,10 +82,10 @@ guaranteed to hold.
 
 \begin{code}
 
--- NOTE: The Graph library uses *directed* graphs. 
---        We add both (x,y,/=) and (y,x,/=), as graph colouring concerns Undirected graphs.
--- Create an instance with colours [0..(n-1)]
--- PRE: n >= 1
+-- | NOTE: The Graph library uses *directed* graphs. 
+-- |       We add both (x,y,/=) and (y,x,/=), as graph colouring concerns Undirected graphs.
+-- | Create an instance with colours [0..(n-1)]
+-- | PRE: n >= 1
 convertGraphToAC3 :: Graph -> Int -> GraphCol 
 convertGraphToAC3 g n = let     
     agents = vertices g
@@ -95,10 +95,12 @@ convertGraphToAC3 g n = let
         -- In graph colouring, we want to check both X's domain to Y, and Y's to X.
         ((head agents, [0]) : [(a, [0..(n-1)]) | a<-tail agents]) 
 
--- Help function: If we have an edge (x,y), we need both (x,y, /=) and (y,x,/=) as constraints.
+-- | Help function: If we have an edge (x,y), we need both (x,y, /=) and (y,x,/=) as constraints.
 reverseCons :: [(a,b,c)] -> [(b,a,c)]
 reverseCons = map (\ (a,b,c) -> (b,a,c))
 
+-- | Given a graph colouring instance, return the graph of it. 
+-- | POST: Edges contains at most 1 Directed edge (x,y) for all vertices x/=y.
 ac3ToGraph :: GraphCol -> Graph 
 ac3ToGraph (GC (AC3 c d)) = let 
     v = [a | (a,_)<-d]
@@ -132,9 +134,19 @@ optimiseGC gc@(GC (AC3 c d)) = let
 
 \end{code}
 
+\hide{ %We leave out this part from the report, due to space considerations.
 The actual main part of the programme, for Graph Colouring:
 
 \begin{code}
+
+graphColMain :: IO ()
+graphColMain = do 
+    choice <- getGraphChoice
+    case choice of 
+        1 -> terminalGraph
+        2 -> fileGraph
+        3 -> benchmarkTests
+        _ -> undefined
 
 getGraphChoice :: IO Int
 getGraphChoice = do 
@@ -152,16 +164,8 @@ getGraphChoice = do
         putStrLn "Invalid choice, please try again."
         getGraphChoice
 
-graphColMain :: IO ()
-graphColMain = do 
-    choice <- getGraphChoice
-    case choice of 
-        1 -> terminalGraph
-        2 -> fileGraph
-        3 -> benchmarkTests
-        _ -> undefined
-
--- PRE: m <= n.
+-- | While m < n, read in an edge (= 2 vertices = 2 integers). 
+-- | PRE: m <= n.
 getEdges :: Int -> Int -> IO [Edge]
 getEdges m n 
   | m == n = return [] 
@@ -173,6 +177,7 @@ getEdges m n
       rest <- getEdges (m+1) n 
       return $ (x,y) : rest
 
+-- | Reads in a graph from the terminal, then calls runGraph.
 terminalGraph :: IO () 
 terminalGraph = do 
   nVertices <- parseInput "Enter the number of vertices: "
@@ -187,8 +192,8 @@ terminalGraph = do
   runGraph g
 
 
--- Given a graphcol instance, we run AC3 on it. If we have at least 1 solution (after back prop.),
---  show it to the user,  and ask if they want to see all solutions.
+-- | Given a graphcol instance, we run AC3 on it. If we have at least 1 solution (after back prop.),
+-- |  show it to the user,  and ask if they want to see all solutions.
 runGraph :: GraphCol -> IO ()
 runGraph (GC ac3Inst) = do 
   let ac3Domain = ac3 ac3Inst 
@@ -211,12 +216,13 @@ runGraph (GC ac3Inst) = do
               when (toUpper (head choice2) == 'Y') $ mapM_ print allSols
             
 \end{code}
- 
-PROBABLY TODO REMOVE (but nice to break up)
 
+} % \hide
+
+\hide{ % same reason as above
 \begin{code}
 
-
+-- | Reads in a graph from a given file.
 readGraphFromFile :: String -> IO GraphCol
 readGraphFromFile filename = do 
   filecon <- readFile filename 
@@ -252,15 +258,16 @@ fileGraph = do
   putStrLn $ "We run AC3 on this instance: " ++ show g
   runGraph g
 
--- PRE: n >= 0.
+-- | Given an int & a list of strings, we try to read these in and make edges from them.
+-- | PRE: n >= 0.
 makeEdges :: Int -> [String] -> [Edge]
 makeEdges 0 _ = []
 -- if n > 0, but we have run out of edges -> fail
-makeEdges _ [] = undefined
-makeEdges _ [_] = undefined
+makeEdges _ [] = error "Not enough edges provided"
+makeEdges _ [_] = error "Incomplete edge provided (only 1 vertex)."
 makeEdges n (x:y:es) = (read x, read y) : makeEdges (n-1) es
 
-
+-- | Given a GraphCol instance, print it in the format used to read in from files.
 graphFileFormat :: GraphCol -> IO () 
 graphFileFormat (GC (AC3 c d)) = do 
   --let nVertices = (fst . last . sort) d 
@@ -276,16 +283,14 @@ graphFileFormat (GC (AC3 c d)) = do
   print . succ $ foldr (\(_,ds) x -> foldr max x ds) 0 d
 
 \end{code}
- 
-PROBABLY TODO REMOVE (but nice to break up)
 
 \begin{code}
 
--- A method to note the difference before & after running AC3.
+-- | A method to note the difference before & after running AC3.
 getTotalDomainOptions :: [Domain a b] -> Int 
 getTotalDomainOptions = foldr (\(_, ds) prev -> length ds + prev) 0
 
-testFiles :: [String] --TODO: Automate this for all files in /lib 
+testFiles :: [String]  
 testFiles = map ("graphcolInstances/"++) 
   ["n10e16nc14.txt", "n10e18nc9.txt", "n10e22nc2.txt", "n15e16nc2.txt", 
    "n15e38nc6.txt", "n15e44nc4.txt", 
@@ -303,10 +308,31 @@ testFilesComps3 = map ("graphcolInstances/"++)
 
 benchmarkTests :: IO ()
 benchmarkTests = mapM_ runBenchmark $ testFiles ++ testFilesComps ++ testFilesComps3 ++ ["graphcolInstances/n10e40nc3_Neg.txt"]
+\end{code}
+} % \hide
 
+\subsubsection{Benchmarking GraphCol}
+We set to benchmark \verb:GraphCol: in 2 different ways: given an instance of \verb:GraphCol:, 
+first, we determine the total number of options across all domains in the instance, 
+  and we compare this to the number of options once we have run \verb:ac3:. We then do the same 
+  having run \verb:optimiseGC:, with and without running \verb:ac3:. 
+
+Next, we run \verb:findSolution: on this instance, as well as on the same instance 
+altered using \verb:ac3: and/or \verb:optimiseGC:, and record the time using Haskell's 
+Criterion library~\cite{criterion}.
+
+\begin{code}
+-- | Given a file name, run the benchmark suite on the graphcol instance in this file.
 runBenchmark :: String -> IO () 
 runBenchmark filename = do
   gc@(GC inst) <- readGraphFromFile filename
+
+\end{code}
+
+Note: Only 1 of the following 2 code blocks should be run, and the other should be hidden.
+
+\begin{code}
+
   let origNOpts =  getTotalDomainOptions $ domains inst
   let newD = ac3 inst  
   let newNOpts = getTotalDomainOptions newD
@@ -320,8 +346,12 @@ runBenchmark filename = do
   putStrLn $ "Post AC-3:       " ++ show newNOpts
   putStrLn $ "OptimiseGC:      " ++ (show . getTotalDomainOptions . domains) optiInst
   putStrLn $ "OptimiseGC AC-3: " ++ show newNOptiD
-  
-  -- Benchmark Criterion bit
+
+\end{code}
+
+\begin{code}
+
+  -- Benchmark using Criterion
   defaultMain [
     bgroup filename [ bench "pre AC-3" $ whnf findSolution inst
                     , bench "post AC-3" $ whnf findSolution (AC3 (cons inst) (ac3 inst))
@@ -331,6 +361,22 @@ runBenchmark filename = do
     ]
 
 \end{code}
+
+To get the most fair comparison between the instance before and after running \verb:ac3:, 
+we will discusses instances where there is no solution.\footnote{Note that the $ac3$ function can change the order of the domain. As a result, comparing 
+            runtimes of $findSolution$ or $findAllSolutions$ may lead to erroneous results.} 
+In such cases, \verb:findSolution: 
+needs to go through the entire search space, and as such \verb:ac3: is most likely 
+to be effective in reducing the run-time. 
+
+We highlight two specific cases, but all results can be found in the \verb:benchmark: folder. 
+
+% Firstly, the \verb:example_N100_AC3: case, which has 100 vertices, 272 constraints or 270 unique edges, and 2 colours. 
+
+
+
+
+
 \hide{
 \begin{code}
 -- src: https://hackage.haskell.org/package/safe-0.3.21/docs/Safe.html#v:lookupJust
@@ -339,6 +385,7 @@ lookupJust key = fromJust . lookup key
 \end{code}
 }
 
+\hide{ % hidden for space, may be explained in words in the report.
 \begin{code}
 
 -- | Given a graph, we want to duplicate it so that we have 2 components, 
@@ -350,11 +397,5 @@ duplicateGraph g = let
   newVcount = 2*length (vertices g)  - 1
   newEdges = concatMap (\(a,b) -> [ (lookupJust a mappingEven, lookupJust b mappingEven) ,  (lookupJust a mappingOdd, lookupJust b mappingOdd)]) (edges g)
   in buildG (0, newVcount) newEdges
-
-
-
-
-
-
-
 \end{code}
+} % \hide
