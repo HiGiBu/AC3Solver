@@ -19,7 +19,11 @@ main :: IO ()
 main = hspec $ do
   describe "Graph colouring Tests" $ do
     it "Vertex 0 should always have as domain only the colour 0" $ 
-      property (\(GC inst) -> (0, [0]) `elem` domains inst)  
+      property (\(GC inst) -> (0, [0]) `elem` domains inst)   
+
+\end{code}
+
+\begin{code} 
     
     it "Each constraint has an edge in the graph of the instance" $ 
       property (\(GC inst) -> let g=ac3ToGraph (GC inst) in all (`elem` edges g) [ (x,y) | (x,y,_)<- cons inst ]) 
@@ -63,6 +67,24 @@ main = hspec $ do
             Nothing -> True 
             Just sol -> checkSolution (cons inst) sol
           )
+    it "If findSolution returns a solution, then each agent should have exactly 1 assignment" $ 
+      property (\(GC inst@(AC3 _ d)) -> let
+          msol = findSolution inst
+          in case msol of 
+            Nothing -> True 
+            Just sol -> let 
+              origiAgents = [ a | (a,_)<-d]
+              newAgents = [a | (a,_)<-sol]
+              in sort origiAgents == sort newAgents
+          )
+    
+    it "duplicateGraph should have 2x the number of components" $ 
+      property (\gc -> let 
+        g = ac3ToGraph gc
+        dupliG = duplicateGraph g
+        in 2 * length (components g) == length (components dupliG) 
+        )
+
     {-
     it "All solutions from findAllSolutions should be legal" $ 
       property (\(GC inst) -> let
@@ -95,10 +117,20 @@ main = hspec $ do
       in all (checkSolution (cons inst)) $ findAllSolutions betterI )
     -}
     -- too slow :{
+\end{code}  
     
-    
-    
-    
+
+% \begin{code}
+
+%   it "generate test cases 2 :)" $ 
+%         property (\(GC inst) -> let 
+%           newD = ac3 inst
+%           in determineNoSol newD || isJust (findSolution (AC3 (cons inst) newD)))
+          
+% \end{code}  
+
+\hide{ % todo remove?
+\begin{code}
     -- yeah so this is just Wrong... but maybe some of the code is useful in the future 
     {-
     it "G 2-colourable iff even degree" $ do 
@@ -115,3 +147,4 @@ main = hspec $ do
       -}
       -- TODO: newDomain does not change underlying graph
 \end{code}
+}
