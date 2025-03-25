@@ -8,7 +8,7 @@ import Criterion.Main
 
 import AC3Solver
 import Backtracking
-import GraphCol (GraphCol(GC), optimiseGC, readGraphFromFile)
+import GraphCol (GraphCol(GC), optimiseGC, readGraphFromFile, duplicateGraph, convertGraphToAC3, ac3ToGraph)
 
 import GraphColExamples -- File that contains the (very big) GC example instances
 
@@ -36,20 +36,26 @@ testFilesComps3 = map ("graphcolInstances/"++)
 runBenchmark :: String -> IO () 
 runBenchmark filename = do
   gc@(GC inst) <- readGraphFromFile filename
-  let origNOpts =  getTotalDomainOptions $ domains inst
-  let newD = ac3 inst  
-  let newNOpts = getTotalDomainOptions newD
+\end{code}
+Run exactly ONE of the following 2 code blocks:
+% \begin{code}
+%   let origNOpts =  getTotalDomainOptions $ domains inst
+%   let newD = ac3 inst  
+%   let newNOpts = getTotalDomainOptions newD
 
-  let (GC optiInst) = optimiseGC gc 
-  let newOptiD = ac3 optiInst
-  let newNOptiD = getTotalDomainOptions newOptiD
+%   let (GC optiInst) = optimiseGC gc 
+%   let newOptiD = ac3 optiInst
+%   let newNOptiD = getTotalDomainOptions newOptiD
 
-  putStrLn $ "Filename: " ++ filename 
-  putStrLn $ "Pre AC-3:        " ++ show origNOpts
-  putStrLn $ "Post AC-3:       " ++ show newNOpts
-  putStrLn $ "OptimiseGC:      " ++ (show . getTotalDomainOptions . domains) optiInst
-  putStrLn $ "OptimiseGC AC-3: " ++ show newNOptiD
-  
+
+
+%   putStrLn $ "Filename: " ++ filename 
+%   putStrLn $ "Pre AC-3:        " ++ show origNOpts
+%   putStrLn $ "Post AC-3:       " ++ show newNOpts
+%   putStrLn $ "OptimiseGC:      " ++ (show . getTotalDomainOptions . domains) optiInst
+%   putStrLn $ "OptimiseGC AC-3: " ++ show newNOptiD
+% \end{code}
+\begin{code}  
   -- Benchmark Criterion bit
   defaultMain [
     bgroup filename [ bench "pre AC-3" $ whnf findSolution inst
@@ -71,6 +77,10 @@ runBenchmark filename = do
 runBig :: (String, GraphCol) -> IO () 
 runBig (sName, gc) = do
   let (GC inst) = gc
+  
+\end{code}
+Run exactly ONE of the following 2 code blocks:
+\begin{code}
   let origNOpts =  getTotalDomainOptions $ domains inst
   let newD = ac3 inst  
   let newNOpts = getTotalDomainOptions newD
@@ -79,25 +89,37 @@ runBig (sName, gc) = do
   let newOptiD = ac3 optiInst
   let newNOptiD = getTotalDomainOptions newOptiD
 
-  putStrLn $ "Filename: " ++ sName 
+
+
+  putStrLn $ "Filename: " ++ filename 
   putStrLn $ "Pre AC-3:        " ++ show origNOpts
   putStrLn $ "Post AC-3:       " ++ show newNOpts
   putStrLn $ "OptimiseGC:      " ++ (show . getTotalDomainOptions . domains) optiInst
   putStrLn $ "OptimiseGC AC-3: " ++ show newNOptiD
+\end{code}
+
+% \begin{code}
+
   
-  -- Benchmark Criterion bit
-  defaultMain [
-    bgroup sName [ bench "pre AC-3" $ whnf findSolution inst
-                    , bench "post AC-3" $ whnf findSolution (AC3 (cons inst) (ac3 inst))
-                    , bench "OptimiseGC, no AC-3" $ whnf (\(GC oi) -> findSolution oi) (optimiseGC gc)
-                    , bench "OptimiseGC, + AC-3 " $ whnf (\(GC oi) -> findSolution (AC3 (cons inst) (ac3 oi))) (optimiseGC gc)
-                    ]
-    ]
+%   -- Benchmark Criterion bit
+%   defaultMain [
+%     bgroup sName [ bench "pre AC-3" $ whnf findSolution inst
+%                     , bench "post AC-3" $ whnf findSolution (AC3 (cons inst) (ac3 inst))
+%                     , bench "OptimiseGC, no AC-3" $ whnf (\(GC oi) -> findSolution oi) (optimiseGC gc)
+%                     , bench "OptimiseGC, + AC-3 " $ whnf (\(GC oi) -> findSolution (AC3 (cons inst) (ac3 oi))) (optimiseGC gc)
+%                     ]
+%     ]
+
+% \end{code}
+
+
+
+\begin{code}
 
 benchmarkTests :: IO ()
 benchmarkTests = do 
     --mapM_ runBenchmark $ testFiles ++ testFilesComps ++ testFilesComps3 ++ ["graphcolInstances/n10e40nc3_Neg.txt"]
-    mapM_ runBig allBigExamples
+    mapM_ runBig ac3_duplicatedGraph
 
 main :: IO ()
 main = benchmarkTests
