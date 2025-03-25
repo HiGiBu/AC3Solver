@@ -62,8 +62,8 @@ benchmarks:
     main: graphBench.lhs
     other-modules: 
       # Note: we can only import one of these at a time, due to their size...
-      # - GraphColExamples
-      - GraphColExamples2
+      - GraphColExamples
+      # - GraphColExamples2
     dependencies:
       - report
       - QuickCheck

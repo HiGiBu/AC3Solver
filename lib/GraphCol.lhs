@@ -312,7 +312,7 @@ benchmarkTests = mapM_ runBenchmark $ testFiles ++ testFilesComps ++ testFilesCo
 } % \hide
 
 \subsubsection{Benchmarking GraphCol}
-We set to benchmark \verb:GraphCol: in 2 different ways: given an instance of \verb:GraphCol:, 
+We set out to benchmark \verb:GraphCol: in 2 different ways: given an instance of \verb:GraphCol:, 
 first, we determine the total number of options across all domains in the instance, 
   and we compare this to the number of options once we have run \verb:ac3:. We then do the same 
   having run \verb:optimiseGC:, with and without running \verb:ac3:. 
@@ -369,11 +369,27 @@ In such cases, \verb:findSolution:
 needs to go through the entire search space, and as such \verb:ac3: is most likely 
 to be effective in reducing the run-time. 
 
-We highlight two specific cases, but all results can be found in the \verb:benchmark: folder. 
+We highlight 
+one specific example, % two specific cases, 
+but all results can be found in the \verb:benchmark: folder. 
 
 % Firstly, the \verb:example_N100_AC3: case, which has 100 vertices, 272 constraints or 270 unique edges, and 2 colours. 
+We take the \verb:example_N200_AC3: case, 
+which has 200 vertices, 11324 constraints or 10548 unique edges, and 3 colours. 
+By running \verb:ac3: on this instance, we can reduce the total number of options 
+in the domain from 598 $(200*3 - 2)$ to 553. 
+Then, running \verb:findSolution:, the runtime decreases from 119ms on the original instance 
+to 45ms running on the reduced instance. 
+This is an instance that greatly benefits from running AC-3, as we see the run-time 
+reducing as a result of the reduced search space.
 
+% Next, we look at \verb:example_N998_AC3_gc:. % \\: to not make the line overrun, which \verb likes to do
+% \verb:N998: is made by effectively duplicating \\ \verb:example_N499_AC3_gc:, 
+% where vertex 0 in \verb:N499: is mapped to 0 and 1 in \verb:N998:, 
+% vertex 1 in \verb:N499: to 2 and 3 in \verb:N998: etc. 
 
+% Leaving this out, both because the post AC-3 result is a bit weird, and cuz space.
+% The point is probably (hopefully?) clear... 
 
 
 
