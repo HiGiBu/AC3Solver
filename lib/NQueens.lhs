@@ -24,9 +24,9 @@ Constraints are generated using list comprehension together with the custom infi
 \begin{code}
 nQueens :: Int -> AC3 Int (Int, Int)
 nQueens n = let
-    agents = [0 .. n-1] -- Queens as row numbers
-    domain = [(row, [(row, col) | col <- [0 .. n-1]]) | row <- agents] -- 1 queen per row
-    constraints = [(a, b, (//=)) | a <- agents, b <- agents, a < b]
+    variables = [0 .. n-1] -- Queens as row numbers
+    domain = [(row, [(row, col) | col <- [0 .. n-1]]) | row <- variables] -- 1 queen per row
+    constraints = [(a, b, (//=)) | a <- variables, b <- variables, a < b]
     in AC3 constraints domain
 \end{code}
 

@@ -17,11 +17,11 @@ This file implements Sudoku in a suitable format for our AC3 and backtracking al
 
 In our formulation:
 
-1. Each cell on the Sudoku board is represented as an \textit{Agent} with its associated domain
-   - An agent is identified by a coordinate $(i,j)$ where $i$ is the row $[1-9]$ and $j$ is the column $[1-9]$
-   - Each agent maintains a domain of possible values $[1-9]$
+1. Each cell on the Sudoku board is represented as a \textit{Variable} with its associated domain
+   - A variable is identified by a coordinate $(i,j)$ where $i$ is the row $[1-9]$ and $j$ is the column $[1-9]$
+   - Each variable maintains a domain of possible values $[1-9]$
 
-2. Sudoku's rules are encoded as binary constraints between agents:
+2. Sudoku's rules are encoded as binary constraints between variables:
 \begin{itemize}
     \item \textbf{Row constraint}: All cells in the same row must contain different values
     \item \textbf{Column constraint}: All cells in the same column must contain different values

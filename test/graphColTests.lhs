@@ -53,7 +53,7 @@ main = hspec $ do
             Just sol -> sol `elem` findAllSolutions inst
           )
     -}
-    it "If an agent has an empty domain, then no solution can be found" $ 
+    it "If an variable has an empty domain, then no solution can be found" $ 
       property (\(GC inst) -> let 
           isSol = determineNoSol $ ac3 inst
           -- if there is defintely no solution, then findSol should indeed return Nothing.
@@ -67,15 +67,15 @@ main = hspec $ do
             Nothing -> True 
             Just sol -> checkSolution (cons inst) sol
           )
-    it "If findSolution returns a solution, then each agent should have exactly 1 assignment" $ 
+    it "If findSolution returns a solution, then each variable should have exactly 1 assignment" $ 
       property (\(GC inst@(AC3 _ d)) -> let
           msol = findSolution inst
           in case msol of 
             Nothing -> True 
             Just sol -> let 
-              origiAgents = [ a | (a,_)<-d]
-              newAgents = [a | (a,_)<-sol]
-              in sort origiAgents == sort newAgents
+              origiVars = [ a | (a,_)<-d]
+              newVars = [a | (a,_)<-sol]
+              in sort origiVars == sort newVars
           )
     
     it "duplicateGraph should have 2x the number of components" $ 

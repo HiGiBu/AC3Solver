@@ -15,11 +15,11 @@ main = hspec $ do
     -- TODO remove
     --it "Example test" $ 
     --  ac3 exampleAC3 `shouldBe` [(4,[1,2]),(3,[0,1,2]),(2,[0,1,2]),(1,[0,1,2]),(0,[0])]
-    it "Positive example (each agent has non-empty domain) - 1" $ 
+    it "Positive example (each variable has non-empty domain) - 1" $ 
       ac3 exampleAC3 `shouldNotSatisfy` determineNoSol
-    it "Positive example (each agent has non-empty domain) - 2" $ 
+    it "Positive example (each variable has non-empty domain) - 2" $ 
       ac3 exampleAC3_2 `shouldNotSatisfy` determineNoSol
-    it "Positive example (each agent has non-empty domain) - 3" $ 
+    it "Positive example (each variable has non-empty domain) - 3" $ 
       ac3 exampleAC3_GFG `shouldNotSatisfy` determineNoSol
 
     it "Positive example (at least 1 actual solution) - 1" $ do
@@ -46,13 +46,13 @@ main = hspec $ do
     --  It says this even with these cases, but that notwithstanding: according to the test report,
     --  we always get the otherwise case, which would seemingly point to us eventually reaching the 
     --      [] = undefined case
-    let xAgent = ("x", [1 :: Int])
-    let yAgent = ("y", [2])
-    let d = [xAgent, yAgent]
+    let xVar = ("x", [1 :: Int])
+    let yVar = ("y", [2])
+    let d = [xVar, yVar]
     it "Test popXy x==a" $ do
-      popXy "x" "y" d `shouldBe` ([1], [2], [yAgent])
+      popXy "x" "y" d `shouldBe` ([1], [2], [yVar])
     it "Test popXy y==a" $ do
-      popXy "y" "x" d `shouldBe` ([2], [1], [xAgent])
+      popXy "y" "x" d `shouldBe` ([2], [1], [xVar])
 
 \end{code}
 
@@ -62,9 +62,9 @@ main = hspec $ do
 exampleAC3 :: AC3 Int Int 
 exampleAC3 = let 
     nColours = 3 
-    nAgents = 5
+    nVars = 5
     -- we assign a specific starting value to an (arbitrary) node. (TODO: for general encoding, if a vertex has no edges, assign an arbit colour.)
-    in AC3 [ (a, (a+1) `mod` nAgents, (/=)) | a<-[0..nAgents-1]] ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nAgents-1]])
+    in AC3 [ (a, (a+1) `mod` nVars, (/=)) | a<-[0..nVars-1]] ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nVars-1]])
 
 
 -- A graph is 2-colourable iff it is bipartite iff it has no cycles of odd length.
@@ -72,44 +72,44 @@ exampleAC3 = let
 exampleAC3_2 :: AC3 Int Int 
 exampleAC3_2 = let 
     nColours = 2 
-    nAgents = 6
+    nVars = 6
     -- we assign a specific starting value to an (arbitrary) node.
-    in AC3 ([ (a, (a-1) `mod` nAgents, (/=)) | a<-[0..nAgents-1]]++[ (a, (a+1) `mod` nAgents, (/=)) | a<-[0..nAgents-1]]) 
-           ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nAgents-1]])
+    in AC3 ([ (a, (a-1) `mod` nVars, (/=)) | a<-[0..nVars-1]]++[ (a, (a+1) `mod` nVars, (/=)) | a<-[0..nVars-1]]) 
+           ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nVars-1]])
 
 -- NOT 2-colourable, as it has an odd cycle (circle of len 5). 
 exampleAC3_bad :: AC3 Int Int 
 exampleAC3_bad = let 
     nColours = 2 
-    nAgents = 5
+    nVars = 5
     -- we assign a specific starting value to an (arbitrary) node.
-    in AC3 ([ (a, (a-1) `mod` nAgents, (/=)) | a<-[0..nAgents-1]]++[ (a, (a+1) `mod` nAgents, (/=)) | a<-[0..nAgents-1]]) 
-           ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nAgents-1]])
+    in AC3 ([ (a, (a-1) `mod` nVars, (/=)) | a<-[0..nVars-1]]++[ (a, (a+1) `mod` nVars, (/=)) | a<-[0..nVars-1]]) 
+           ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nVars-1]])
 
 -- NOT 1-colourable, as it has an edge.
 exampleAC3_triv :: AC3 Int Int 
 exampleAC3_triv = let 
     nColours = 1 -- can only be 1-colourable iff cons = [].
-    nAgents = 5
+    nVars = 5
     -- we assign a specific starting value to an (arbitrary) node.
-    in AC3 ([ (a, (a+1) `mod` nAgents, (/=)) | a<-[0..nAgents-1]]) 
-           ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nAgents-1]])
+    in AC3 ([ (a, (a+1) `mod` nVars, (/=)) | a<-[0..nVars-1]]) 
+           ((0, [0]) : [ (a, [0..nColours-1]) | a<-[1..nVars-1]])
 
 -- Example based on https://www.geeksforgeeks.org/3-coloring-is-np-complete/
 -- IS 3-colourable.
 exampleAC3_GFG :: AC3 String Int 
 exampleAC3_GFG = let 
     nColours = 3 -- can only be 1-colourable iff cons = []. 
-    agentsA = ["v", "w", "u", "x"]
-    agentsB = [s++"'" | s<-agentsA]
-    agents = agentsA ++ agentsB -- does NOT include "B"
+    varsA = ["v", "w", "u", "x"]
+    varsB = [s++"'" | s<-varsA]
+    vars = varsA ++ varsB -- does NOT include "B"
 
-    bCons = [("B", a, (/=)) | a<-agents]
-    outsideCons = [ (a, a++"'", (/=)) | a<-agentsA ]
+    bCons = [("B", a, (/=)) | a<-vars]
+    outsideCons = [ (a, a++"'", (/=)) | a<-varsA ]
     reverseCons = map (\ (a,b,c) -> (b,a,c))
     in AC3 (bCons ++ reverseCons bCons ++ 
                 outsideCons ++ reverseCons outsideCons) 
-           ( ("B", [0]) : [ (a, [0..nColours-1]) | a <- agents])
+           ( ("B", [0]) : [ (a, [0..nColours-1]) | a <- vars])
 
 -- A problem that should have no solutions
 exampleAC3_no_solution :: AC3 Int Int 

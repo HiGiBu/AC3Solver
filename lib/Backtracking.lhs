@@ -14,16 +14,16 @@ module Backtracking where
 
 import AC3Solver
 
-type Assignment a b = (Agent a, b)
+type Assignment a b = (Variable a, b)
 
 \end{code}
 
 First of all, we can provide a fast method to check that a solution is even \emph{theoretically} 
-possible: if at least 1 agent has an empty domain, then there will never be a legal assignment.
+possible: if at least 1 variable has an empty domain, then there will never be a legal assignment.
 
 \begin{code}
 
---Returns true iff at least 1 agent has an empty domain.
+--Returns true iff at least 1 variable has an empty domain.
 --Post: Returns true -> \not \exist a solution. 
 --      However, returns false does NOT guarantee that a solution exists.
 determineNoSol :: [Domain a b] -> Bool 
@@ -32,10 +32,10 @@ determineNoSol = any (\(_,ds) -> null ds)
 \end{code}
 
 Next, we use backtracking to try and find a solution, using backtracking.
-For our agent X, we iterate over each value in X's domain. 
+For our variable X, we iterate over each value in X's domain. 
 For every constraint (X,Y) or (Y,X), where Y has already got an assigned value, 
 we check if this constraint holds. If at least one of these constraints does not hold, 
-then we continue with the next value in X's domain. Else, we continue with the next agent.
+then we continue with the next value in X's domain. Else, we continue with the next variable.
 If we find a valid assignment \verb:Just ...:, then we return this, else we try the next 
 value in X's domain. 
 
@@ -55,7 +55,7 @@ helpFS _ [] as = Just as -- Done
 helpFS constrs ((x, ds):dss) as = recurseFS ds where 
     recurseFS [] = Nothing 
     recurseFS (d:ds') = let 
-        -- we want to try assigning value d to agent x. 
+        -- we want to try assigning value d to variable x. 
         -- Get all constraints (X,Y) and (Y,X), where Y already has a value assigned to it.
         -- Check if x=d works, for all previously assigned values Y.
         checkCons = and $
@@ -106,14 +106,14 @@ Help-functions used by our solution methods.
 
 \begin{code}
 
--- Find whether agent Y has an assignment.
-elemAs :: Eq a => Agent a -> [Assignment a b] -> Bool 
+-- Find whether variable Y has an assignment.
+elemAs :: Eq a => Variable a -> [Assignment a b] -> Bool 
 elemAs _ [] = False
 elemAs y ((x,_):as) = x==y || y `elemAs` as 
 
--- Find agent Y's assigned value
+-- Find variable Y's assigned value
 -- PRE: y \in as.
-valY :: Eq a => Agent a -> [Assignment a b] -> b 
+valY :: Eq a => Variable a -> [Assignment a b] -> b 
 valY _ [] = error "Y's value could not be found in the assignment." -- should not happen.
 valY y ((x,b):as) = if x == y then b else valY y as
 

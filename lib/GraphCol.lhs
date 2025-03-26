@@ -29,7 +29,7 @@ import Scheduling (parseInput)
 We make use of Haskell's Graph library, following in its convention that vertices are 
 numbers, and edges are pairs of vertices. 
 
-We define a newtype \verb:GraphCol: using \verb:AC3:, where the agents are of type \verb:Vertex: 
+We define a newtype \verb:GraphCol: using \verb:AC3:, where the variables are of type \verb:Vertex: 
 and the domain is a set of colours $\subseteq$ \verb:[0..(n-1)]:.
 All constraints should be of the form \verb:(X,Y,(/=)):, and this represents an edge \verb:(X,Y):
 in the graph. 
@@ -88,12 +88,12 @@ guaranteed to hold.
 -- | PRE: n >= 1
 convertGraphToAC3 :: Graph -> Int -> GraphCol 
 convertGraphToAC3 g n = let     
-    agents = vertices g
+    variables = vertices g
     constr = [(x,y, (/=)) | (x,y)<-edges g]
     in GC $ AC3 
         (constr ++ reverseCons constr) 
         -- In graph colouring, we want to check both X's domain to Y, and Y's to X.
-        ((head agents, [0]) : [(a, [0..(n-1)]) | a<-tail agents]) 
+        ((head variables, [0]) : [(a, [0..(n-1)]) | a<-tail variables]) 
 
 -- | Help function: If we have an edge (x,y), we need both (x,y, /=) and (y,x,/=) as constraints.
 reverseCons :: [(a,b,c)] -> [(b,a,c)]
@@ -198,9 +198,9 @@ runGraph :: GraphCol -> IO ()
 runGraph (GC ac3Inst) = do 
   let ac3Domain = ac3 ac3Inst 
   if determineNoSol ac3Domain 
-    then putStrLn "AC3 has found an empty domain for at least 1 agent -> No solution"
+    then putStrLn "AC3 has found an empty domain for at least 1 variable -> No solution"
     else do 
-      putStrLn "AC3 has at least 1 option for each agent."
+      putStrLn "AC3 has at least 1 option for each variable. Checking for solution..."
       case findSolution ac3Inst of 
         Nothing -> putStrLn "There is no solution based on the reduced AC3 input."
         Just sol -> do 

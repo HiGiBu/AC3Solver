@@ -70,9 +70,9 @@ checkTime a (_,x,_) = x == a
 checkRoom :: Int -> ClassAssignment -> Bool
 checkRoom a (_,_,x) = x == a
 
-filterDomains :: [Domain Int ClassAssignment] -> [(Agent Int, ClassAssignment -> Bool)] -> [Domain Int ClassAssignment]
+filterDomains :: [Domain Int ClassAssignment] -> [(Variable Int, ClassAssignment -> Bool)] -> [Domain Int ClassAssignment]
 filterDomains domainList conditions =
-    [(agent, [v | v <- values, all (\(a, f) -> (a /= agent) || f v) conditions]) | (agent, values) <- domainList]
+    [(variable, [v | v <- values, all (\(a, f) -> (a /= variable) || f v) conditions]) | (variable, values) <- domainList]
 
 getConstraint :: [String] -> IO (Maybe [ConstraintAA Int ClassAssignment])
 getConstraint classNames = do
@@ -105,7 +105,7 @@ collectConstraints classNames = do
           Just cs  -> loop (cs ++ acc)
   loop []
 
-getStartingValues :: [String] -> [String] -> [String] -> IO (Maybe (Agent Int, ClassAssignment -> Bool))
+getStartingValues :: [String] -> [String] -> [String] -> IO (Maybe (Variable Int, ClassAssignment -> Bool))
 getStartingValues classNames roomNames timeslotNames = do
   putStrLn "Enter known values (e.g., 'class1 is in room3', 'class1 is at 11am' or 'class1 is on monday'). Type 'Done' to finish:"
   input <- getLine
@@ -119,7 +119,7 @@ getStartingValues classNames roomNames timeslotNames = do
         putStrLn "Invalid input format"
         getStartingValues classNames roomNames timeslotNames
 
-processStartingValues :: String -> String -> String -> [String] -> [String] -> IO (Agent Int, ClassAssignment -> Bool)
+processStartingValues :: String -> String -> String -> [String] -> [String] -> IO (Variable Int, ClassAssignment -> Bool)
 processStartingValues class1 value keyword classNames valueNames = do
   case (elemIndex class1 classNames, elemIndex value valueNames) of
     (Just i, Just j) -> case keyword of
@@ -129,7 +129,7 @@ processStartingValues class1 value keyword classNames valueNames = do
       _           -> error "Invalid keyword"
     _ -> error "Invalid name"
 
-collectStartingValues :: [String] -> [String] -> [String] -> IO [(Agent Int, ClassAssignment -> Bool)]
+collectStartingValues :: [String] -> [String] -> [String] -> IO [(Variable Int, ClassAssignment -> Bool)]
 collectStartingValues classNames roomNames timeslotNames = do
   let loop acc = do
         value <- getStartingValues classNames roomNames timeslotNames
@@ -138,11 +138,11 @@ collectStartingValues classNames roomNames timeslotNames = do
           Just svs  -> loop (svs : acc)
   loop []
 
-printSolution :: [String] -> [String] -> [String] -> [String] -> [(Agent Int, ClassAssignment)] -> IO ()
+printSolution :: [String] -> [String] -> [String] -> [String] -> [(Variable Int, ClassAssignment)] -> IO ()
 printSolution classNames days roomNames timeSlotNames list = putStrLn $ concat
-  [classNames !! agent ++ " is scheduled on " ++ days !! dayId ++
+  [classNames !! variable ++ " is scheduled on " ++ days !! dayId ++
     " in " ++ roomNames !! roomId ++ " at " ++ timeSlotNames !! timeId ++ ".\n"
-  | (agent, (dayId, roomId, timeId)) <- list]
+  | (variable, (dayId, roomId, timeId)) <- list]
 
 schedulingMain :: IO ()
 schedulingMain = do

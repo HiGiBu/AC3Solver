@@ -13,18 +13,18 @@ import Control.Monad.Writer
 \end{code}
 
 To start of, we define the \verb:AC3: instance. 
-% For each problem instance, we have a set of agents of type \verb:a:.
+% For each problem instance, we have a set of variables of type \verb:a:.
 An \verb:AC3: instance constains a list of constraints \verb:constraintAA:, and a list of domains.  
-Each \verb:constraintAA: contains a pair of agents $(X,Y)$, and then a function, such as \verb:(==):, 
+Each \verb:constraintAA: contains a pair of variables $(X,Y)$, and then a function, such as \verb:(==):, 
 which is the constraint on the arc from $X$ to $Y$.
     \footnote{Note that we only allow for \emph{binary} constraints. 
     The AC-3 algorithm does not allow for ternary (or greater) constraints, and unary constraints can be resolved 
-    by restricting that agent's domain. \cite{AC3} provides other approaches for achieving path consistency, where you may have ternary (or greater) constraints.}
-Each \verb:Domain: item contains an agent, and then a list of values of type \verb:b:. 
+    by restricting that variables's domain. \cite{AC3} provides other approaches for achieving path consistency, where you may have ternary (or greater) constraints.}
+Each \verb:Domain: item contains an variable, and then a list of values of type \verb:b:. 
 
-We may have multiple constraints for a pair of agents $(X,Y)$, such as both \verb:(>): and \verb:(>=):, 
-or an agent may not be in any constraint.  
-The programme however expects that each agent has exactly 1 (possibly empty) domain specified for it.
+We may have multiple constraints for a pair of variables $(X,Y)$, such as both \verb:(>): and \verb:(>=):, 
+or an variable may not be in any constraint.  
+The programme however expects that each variable has exactly 1 (possibly empty) domain specified for it.
 
 Note that we do not define an arbitrary instance for AC3. Instead, we can define arbitrary instances 
 for specific problems. (See for example Section~\ref{sec:GraphCol}.)
@@ -32,17 +32,17 @@ for specific problems. (See for example Section~\ref{sec:GraphCol}.)
 \begin{code}
 
 data AC3 a b = AC3 { 
-    -- Constraint should take values from the first & second agents as params x & y resp. in \x,y-> x ?=? y. 
+    -- Constraint should take values from the first & second variables as params x & y resp. in \x,y-> x ?=? y. 
     -- We should allow for multiple constraints for (X,Y), eg. both (x > y) AND (x < y) in the set. 
     cons :: [ConstraintAA a b], 
     -- Assume we have 1 domain list for each variable.
     domains :: [Domain a b] } 
 
-type Domain a b = (Agent a, [b])
-type ConstraintAA a b = (Agent a, Agent a, Constraint b)
+type Domain a b = (Variable a, [b])
+type ConstraintAA a b = (Variable a, Variable a, Constraint b)
 type Constraint a = a -> a -> Bool
 
-type Agent a = a 
+type Variable a = a 
 
 \end{code}
 
@@ -73,7 +73,7 @@ checkDomain (x:xs) ys c = do
 \end{code}
 }
 
-Each time we call iterate, we start by looking for the domains of agents $X$ \& $Y$ 
+Each time we call iterate, we start by looking for the domains of variables $X$ \& $Y$ 
 for our constraint $(X,Y)$. Once we find these, we are likely to replace the original
 domain for $X$ with a reduced one. We use \verb:popXy: and \verb:popX: to find the domains
 for $X$ \& $Y$, and at the same time we also remove the \emph{old} domain for $X$. 
@@ -85,16 +85,16 @@ for $X$ \& $Y$, and at the same time we also remove the \emph{old} domain for $X
 
 -- | PRE: x is an element of (a:as) 
 -- | POST: Output = (X's domain, the original domain with X's domain removed.)
-popX :: Eq a => Agent a -> [Domain a b] -> ([b], [Domain a b] )
-popX _ [] = error "No domain found for an agent X in a constraint." -- should not occur.
+popX :: Eq a => Variable a -> [Domain a b] -> ([b], [Domain a b] )
+popX _ [] = error "No domain found for a Variable X in a constraint." -- should not occur.
 popX x (a@(aA, aD):as) = if x == aA then (aD,as) 
                          else let (x', as') = popX x as in (x', a:as')
 
 -- | PRE: x != y; x,y are elements of (a:as). 
 -- |     (else, this is not a binary constraint but a unary one.) 
 -- | POST: Output = (X's domain [b], Y's domain [b], the original domain d with X's domain removed.)
-popXy :: Eq a => Agent a -> Agent a -> [Domain a b] -> ([b], [b], [Domain a b] )
-popXy _ _ [] = error "No domains found for both agents X & Y in a constraint." -- should not occur.
+popXy :: Eq a => Variable a -> Variable a -> [Domain a b] -> ([b], [b], [Domain a b] )
+popXy _ _ [] = error "No domains found for both variables X & Y in a constraint." -- should not occur.
 popXy x y (a@(aA, aD):as) 
     | x == aA = let -- we want to REMOVE a from the list.
         -- search through the rest of the list and return y's domain.
@@ -115,9 +115,9 @@ If $X$'s domain was altered, then we add all constraints of the form $(Y,X)$ to 
 
 \begin{code}
 -- | Given an legal AC3 instance, this function returns a reduced list of domains, where 
--- |    each agent's domain now only contains values which are arc-consistent with
+-- |    each variable's domain now only contains values which are arc-consistent with
 -- |    the set constraints. 
--- | POST: for each agent x, x's domain in the output \subseteq x's domain originally. 
+-- | POST: for each variable x, x's domain in the output \subseteq x's domain originally. 
 ac3 :: (Ord a, Ord b) => AC3 a b -> [Domain a b] -- return a list of domains.
 ac3 m@(AC3 c d) = let 
     queue = c 
