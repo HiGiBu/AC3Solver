@@ -47,11 +47,9 @@ readTextFile filePath = do
   content <- readFile filePath
   let linesOfFile = filter (not . null) (lines content)
 
-  -- Ensure the sections exist and split based on section markers
   let (headerLines, rest1) = break (isPrefixOf "--- CONSTRAINTS ---") linesOfFile
   let (constraintLines, rest2) = break (isPrefixOf "--- STARTING VALUES ---") (tail rest1)
 
-  -- Error checking
   if null headerLines || null rest1 || null constraintLines || null rest2
     then error "Invalid file format."
     else case headerLines of
@@ -223,7 +221,7 @@ printSolution :: [String] -> [String] -> [String] -> [String] -> [(Variable Int,
 printSolution classNames days roomNames timeSlotNames list = putStrLn $ concat
   [classNames !! agent ++ " is scheduled on " ++ days !! dayId ++
     " in " ++ roomNames !! roomId ++ " at " ++ timeSlotNames !! timeId ++ ".\n"
-  | (agent, (dayId, roomId, timeId)) <- list]
+  | (agent, (dayId, timeId, roomId)) <- list]
 
 schedulingMain :: Maybe String -> IO ()
 schedulingMain Nothing = do
