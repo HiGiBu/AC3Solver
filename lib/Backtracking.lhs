@@ -50,7 +50,7 @@ having run \verb:ac3:, and so we can compare the runtime of findSolution before 
 findSolution :: Eq a => AC3 a b -> Maybe [Assignment a b]
 findSolution (AC3 c d) = helpFS c d []
 
-helpFS :: Eq a => [ConstraintAA a b] -> [Domain a b] -> [Assignment a b] -> Maybe [Assignment a b]
+helpFS :: Eq a => [Arc a b] -> [Domain a b] -> [Assignment a b] -> Maybe [Assignment a b]
 helpFS _ [] as = Just as -- Done
 helpFS constrs ((x, ds):dss) as = recurseFS ds where 
     recurseFS [] = Nothing 
@@ -79,7 +79,7 @@ findAllSolutions :: Eq a => AC3 a b -> [[Assignment a b]]
 findAllSolutions (AC3 c d) = helpFSAll c d []
 
 -- helper function for find all
-helpFSAll :: Eq a => [ConstraintAA a b] -> [Domain a b] -> [Assignment a b] -> [[Assignment a b]]
+helpFSAll :: Eq a => [Arc a b] -> [Domain a b] -> [Assignment a b] -> [[Assignment a b]]
 helpFSAll _ [] as = [as]  -- Found a complete solution
 helpFSAll constrs ((x, ds):dss) as = concatMap recurseFS ds where
     recurseFS d =
@@ -93,7 +93,7 @@ Given a solution, verify whether this solution is permissible with the provided 
 
 \begin{code}
 
-checkSolution :: Eq a => [ConstraintAA a b] -> [Assignment a b] -> Bool 
+checkSolution :: Eq a => [Arc a b] -> [Assignment a b] -> Bool 
 checkSolution [] _ = True 
 checkSolution ((x,y,f):cs) as = elemAs x as && elemAs y as && let   
     xN = valY x as 

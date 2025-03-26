@@ -7,7 +7,7 @@ import Data.Time.Clock ( getCurrentTime, diffUTCTime )
 import Text.Printf ( printf )
 
 -- Import AC3 solver and backtracking algorithm
-import AC3Solver ( AC3 (..), ac3, ConstraintAA, Domain )
+import AC3Solver ( AC3 (..), ac3, Arc, Domain )
 import Backtracking ( findSolution )
 
 \end{code}
@@ -55,7 +55,7 @@ With these conditions, the constraints can be modelled as a list of inequalities
 an inequality if they are distinct and share the same row, column, or box.
 
 \begin{code}
-sudokuConstraints :: [ConstraintAA (Int, Int) Int]
+sudokuConstraints :: [Arc (Int, Int) Int]
 sudokuConstraints =    [(i, j, (/=)) | i <- allCells, j <- allCells, i /= j, i `sameRow` j]
                     ++ [(i, j, (/=)) | i <- allCells, j <- allCells, i /= j, i `sameCol` j]
                     ++ [(i, j, (/=)) | i <- allCells, j <- allCells, i /= j, i `sameBox` j]

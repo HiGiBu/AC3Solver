@@ -74,7 +74,7 @@ filterDomains :: [Domain Int ClassAssignment] -> [(Variable Int, ClassAssignment
 filterDomains domainList conditions =
     [(variable, [v | v <- values, all (\(a, f) -> (a /= variable) || f v) conditions]) | (variable, values) <- domainList]
 
-getConstraint :: [String] -> IO (Maybe [ConstraintAA Int ClassAssignment])
+getConstraint :: [String] -> IO (Maybe [Arc Int ClassAssignment])
 getConstraint classNames = do
   putStrLn "Enter a constraint (e.g., 'class1 is before class2' or 'class1 is the same day as class2'). Type 'Done' to finish:"
   input <- getLine
@@ -87,7 +87,7 @@ getConstraint classNames = do
         putStrLn "Invalid input format"
         getConstraint classNames
 
-processConstraints :: String -> String -> String -> [String] -> IO [ConstraintAA Int ClassAssignment]
+processConstraints :: String -> String -> String -> [String] -> IO [Arc Int ClassAssignment]
 processConstraints class1 class2 keyword classNames = do
   case (elemIndex class1 classNames, elemIndex class2 classNames) of
     (Just i, Just j) -> case keyword of
@@ -96,7 +96,7 @@ processConstraints class1 class2 keyword classNames = do
       _           -> error "Invalid keyword"
     _ -> error "Invalid class names"
 
-collectConstraints :: [String] -> IO [ConstraintAA Int ClassAssignment]
+collectConstraints :: [String] -> IO [Arc Int ClassAssignment]
 collectConstraints classNames = do
   let loop acc = do
         constraint <- getConstraint classNames

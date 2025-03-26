@@ -14,8 +14,8 @@ import Control.Monad.Writer
 
 To start of, we define the \verb:AC3: instance. 
 % For each problem instance, we have a set of variables of type \verb:a:.
-An \verb:AC3: instance constains a list of constraints \verb:constraintAA:, and a list of domains.  
-Each \verb:constraintAA: contains a pair of variables $(X,Y)$, and then a function, such as \verb:(==):, 
+An \verb:AC3: instance constains a list of constraints \verb:Arc:, and a list of domains.  
+Each \verb:Arc: contains a pair of variables $(X,Y)$, and then a function, such as \verb:(==):, 
 which is the constraint on the arc from $X$ to $Y$.
     \footnote{Note that we only allow for \emph{binary} constraints. 
     The AC-3 algorithm does not allow for ternary (or greater) constraints, and unary constraints can be resolved 
@@ -34,12 +34,12 @@ for specific problems. (See for example Section~\ref{sec:GraphCol}.)
 data AC3 a b = AC3 { 
     -- Constraint should take values from the first & second variables as params x & y resp. in \x,y-> x ?=? y. 
     -- We should allow for multiple constraints for (X,Y), eg. both (x > y) AND (x < y) in the set. 
-    cons :: [ConstraintAA a b], 
+    cons :: [Arc a b], 
     -- Assume we have 1 domain list for each variable.
     domains :: [Domain a b] } 
 
 type Domain a b = (Variable a, [b])
-type ConstraintAA a b = (Variable a, Variable a, Constraint b)
+type Arc a b = (Variable a, Variable a, Constraint b)
 type Constraint a = a -> a -> Bool
 
 type Variable a = a 
@@ -123,7 +123,7 @@ ac3 m@(AC3 c d) = let
     queue = c 
     in iterateAC3 m queue d
 
-iterateAC3 :: (Ord a, Ord b) => AC3 a b -> [ConstraintAA a b] -> [Domain a b] 
+iterateAC3 :: (Ord a, Ord b) => AC3 a b -> [Arc a b] -> [Domain a b] 
                 -> [Domain a b]
 iterateAC3 _ [] d = d
 iterateAC3 m@(AC3 fullCS _) ((x,y,c):cs) d = let 
