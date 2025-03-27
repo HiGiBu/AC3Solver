@@ -224,8 +224,8 @@ printSolution classNames days roomNames timeSlotNames list = putStrLn $ concat
   | (agent, (dayId, timeId, roomId)) <- list]
 
 filePath :: Maybe String
---filePath = Nothing
-filePath = Just "filePath"
+filePath = Nothing
+--filePath = Just "filePath"
 
 schedulingMain :: IO ()
 schedulingMain = case filePath of 
