@@ -23,103 +23,93 @@ Kools are smoked in the house next to the house where the horse is kept.
 The Norwegian lives next to the blue house
 \end{quote}
 \begin{code}
+houses :: [String]
 houses = ["1", "2", "3", "4", "5"]
+nationalities :: [String]
 nationalities = ["Englishman", "Spaniard", "Ukrainian", "Norwegian", "Japanese"]
+colors :: [String]
 colors = ["red", "green", "ivory", "yellow", "blue"]
+drinks :: [String]
 drinks = ["coffee", "tea", "milk", "orange juice", "water"]
+smokes :: [String]
 smokes = ["Old Gold", "Kools", "Chesterfields", "Lucky Strike", "Parliaments"]
+pets :: [String]
 pets = ["dog", "snails", "fox", "horse", "zebra"]
+agents :: [String]
 agents = houses ++ nationalities ++ colors ++ drinks ++ smokes ++ pets
-
-
+type World = (String, String, String, String, String, String)
+type Var = String
 permute6 :: [a] -> [b] -> [c] -> [d] -> [e] -> [f] -> [(a, b, c, d, e, f)]
-permute6 al bl cl dl el fl = [(a, b, c, d, e, f) | a <- al, b <- bl, c <- cl, d <- dl, e <- el, f <- fl]
+permute6 hl cl drl sl pl nl = [(h, c, dr, s, p, n) | h <- hl, c <- cl, dr <- drl, s <- sl, p <- pl, n <- nl]
 
+domainH :: [(Var, [World])]
 domainH = [(h, permute6 [h] colors drinks smokes pets nationalities) | h <- houses]
+domainC :: [(String, [World])]
 domainC = [(c, permute6 houses [c] drinks smokes pets nationalities) | c <- colors]
+domainD :: [(String, [World])]
 domainD = [(dr, permute6 houses colors [dr] smokes pets nationalities) | dr <- drinks] 
+domainS :: [(String, [World])]
 domainS = [(s, permute6 houses colors drinks [s] pets nationalities) | s <- smokes]
+domainP :: [(String, [World])]
 domainP = [(p, permute6 houses colors drinks smokes [p] nationalities) | p <- pets]
+domainN :: [(String, [World])]
 domainN = [(n, permute6 houses colors drinks smokes pets [n]) | n <- nationalities]
+d :: [(String, [World])]
 d = domainH ++ domainC ++ domainD ++ domainS ++ domainP ++ domainN
 
 \end{code}
 
 \begin{code}
-constraintVal = [(x, y, validity) | x <- agents, y <- agents, x /= y]
 ints :: Eq a => [a] -> [a] -> [a]
 ints xs ys = filter (`elem` ys) xs
-validity :: (String, String, String, String, String, String) ->  (String, String, String, String, String, String) -> Bool
-validity (h, c, dr, s, p, n) _ = (null eRint || eRint == eR) && (null sDint || sDint == sD) && (null cGint || cGint == cG) && (null uTint || uTint == uT) && (null oGint || oGint == oG) && (null kYint || kYint == kY) && (null m3int || m3int == m3) && (null n1int || n1int == n1) && (null lSint || lSint == lS) && (null jPint || jPint == jP)
-        where 
-        eRint = ints eR [h, c, dr, s, p, n]
-        sDint = ints sD [h, c, dr, s, p, n]
-        cGint = ints cG [h, c, dr, s, p, n]
-        uTint = ints uT [h, c, dr, s, p, n]
-        oGint = ints oG [h, c, dr, s, p, n]
-        kYint = ints kY [h, c, dr, s, p, n]
-        m3int = ints m3 [h, c, dr, s, p, n]
-        n1int = ints n1 [h, c, dr, s, p, n]
-        lSint = ints lS [h, c, dr, s, p, n]
-        jPint = ints jP [h, c, dr, s, p, n]
-cF = ["Chesterfield", "fox"]
-kH = ["Kools", "horse"]
-nB = ["Norwegian", "blue"]
-gi = ["green", "ivory"]
-constraintValN :: [(String, String,   (String, String, String, String, String, String)   -> (String, String, String, String, String, String) -> Bool)]
-constraintValN = [(x, y, validityN) | x <- agents, y <- agents, x /= y]
-validityN :: (String, String, String, String, String, String) ->  (String, String, String, String, String, String) -> Bool
-validityN (h, c, dr, s, p, n) _ = cFint /= cF && kHint /= kH && nBint /= nB && giint /= gi
-        where 
-        cFint = ints cF [h, c, dr, s, p, n]
-        kHint = ints kH [h, c, dr, s, p, n]
-        nBint = ints nB [h, c, dr, s, p, n]
-        giint = ints gi [h, c, dr, s, p, n]
 
-notEqual :: (String, String, String, String, String, String) ->  (String, String, String, String, String, String) -> Bool
-notEqual (a, b, c, d, e, f) (g, h, i, j, k, l) = a /= g && b /= h && c /= i && d /= j && e /= k && f /= l
+notEqual :: World ->  World -> Bool
+notEqual (h, c, dr, s, p, n) (h', c', dr', s', p', n') = h /= h' && c /= c' && dr /= dr' && s /= s' && p /= p' && n /= n'
 
-unique :: (String, String, String, String, String, String) -> (String, String, String, String, String, String) -> Bool  
+unique :: World -> World -> Bool  
 unique w@(h, c, dr, s, p, n) w'@(h', c', dr', s', p', n') = (w == w') || (h /= h' && c /= c' && dr /= dr' && s /= s' && p /= p' && n /= n')
 checkDistance :: String -> String  -> Int
 checkDistance x y = abs (read x -  read y)
-greenIvory :: (String, String, String, String, String, String) ->  (String, String, String, String, String, String) -> Bool
+greenIvory :: World ->  World -> Bool
 greenIvory (x, _, _, _, _, _) (y, _, _, _, _, _) = (x, y) == ("1", "2") || (x, y) == ("2", "3") || (x, y) == ("3","4") || (x, y) == ("4", "5")
 
-nextDoor :: (String, String, String, String, String, String) ->  (String, String, String, String, String, String) -> Bool
+nextDoor :: World ->  World -> Bool
 nextDoor (x, _, _, _, _, _) (y, _, _, _, _, _) = checkDistance x y == 1
 
 
+validity :: World ->  World -> Bool
+validity (h, c, dr, s, p, n) _ =   all ((\ x -> null x || (length x == 2)) . (`ints` [h, c, dr, s, p, n])) equalPairs
+validityN :: World ->  World -> Bool
+validityN (h, c, dr, s, p, n) _ =   all ((\ x -> length x /= 2) . (`ints` [h, c, dr, s, p, n])) nonEqualPairs
 
-eR = ["Englishman", "red"]
-sD = ["Spaniard", "dog"]
-cG = ["coffee", "green"]
-uT = ["Ukrainian", "tea"]
-oG = ["Old Gold", "snails"]
-kY = ["Kools", "yellow"]
-m3 = ["milk", "3"]
-n1 = ["Norwegian", "1"]
-lS = ["Lucky Strike", "orange juice"]
-jP = ["Japanese", "Parliaments"]
+nonEqualPairs :: [[String]]
+nonEqualPairs = [["Chesterfields", "fox"], ["Kools", "horse"], ["Norwegian", "blue"], ["green", "ivory"]]
 
-constraintEr = [("Englishman", "red", (==)), ("red", "Englishman", (==))]
-constraintSd = [("Spaniard", "dog", (==)), ("dog", "Spaniard", (==))] 
-constraintCg = [("coffee", "green", (==)), ("green", "coffee", (==))] 
-constraintUt = [("Ukrainian", "tea", (==)), ("tea", "Ukrainian", (==))] 
-constraintOg = [("Old Gold", "snails", (==)), ("snails", "Old Gold", (==))] 
-constraintKy = [("Kools", "yellow", (==)), ("yellow", "Kools", (==))] 
-constraintM3 = [("milk", "3", (==)), ("3", "milk", (==))] 
-constraintN1 = [("Norwegian", "1", (==)), ("1", "Norwegian", (==))] 
-constraintLs = [("Lucky Strike", "orange juice", (==)), ("orange juice", "Lucky Strike", (==))] 
-constraintJp = [("Japanese", "Parliaments", (==)), ("Parliaments", "Japanese", (==))]
-constraintEq = constraintEr ++ constraintSd ++ constraintCg ++ constraintUt ++ constraintOg ++ constraintKy ++ constraintM3 ++ constraintN1 ++ constraintLs ++ constraintJp
+equalPairs :: [[String]]
+equalPairs = [["Englishman", "red"], ["Spaniard", "dog"], ["coffee", "green"], ["Ukrainian", "tea"], ["Old Gold", "snails"], ["Kools", "yellow"], ["milk", "3"], ["Norwegian", "1"], ["Lucky Strike", "orange juice"], ["Japanese", "Parliaments"]]
+
+constraintVal :: [(String, String,   World  -> World -> Bool)]
+constraintVal = [(x, y, validity) | x <- agents, y <- agents, x /= y]
+
+constraintValN :: [(String, String,   World   -> World -> Bool)]
+constraintValN = [(x, y, validityN) | x <- agents, y <- agents, x /= y]
+
+constraintEq :: [(String, String,   World   -> World -> Bool)]
+constraintEq = [(x, y, (==)) | [x, y] <- equalPairs] ++ [(x, y, (==)) | [y, x] <- equalPairs]
+constraintUnique :: [(String, String, World -> World -> Bool)]
 constraintUnique = [(x, y, unique) | x <- agents, y <- agents, x /= y]
-constraintGi = [("green", "ivory", greenIvory), ("ivory", "green", flip greenIvory), ("green", "ivory", notEqual)]
-constraintCf = [("Chesterfields", "fox", nextDoor), ("fox", "Chesterfields", nextDoor), ("Chesterfields", "fox", notEqual)]
-constraintKh = [("Kools", "horse", nextDoor), ("horse", "Kools", nextDoor), ("Kools", "horse", notEqual)]
-constraintNb = [("Norwegian", "blue", nextDoor), ("blue", "Norwegian", nextDoor), ("Norwegian", "blue", notEqual)]
-constraintsNeQ = constraintGi ++ constraintCf ++ constraintKh ++ constraintNb
+constraintGi :: [(String, String, World -> World -> Bool)]
+constraintGi = [("green", "ivory", greenIvory), ("ivory", "green", flip greenIvory)]
+constraintCf :: [(String, String, World -> World -> Bool)]
+constraintCf = [("Chesterfields", "fox", nextDoor), ("fox", "Chesterfields", nextDoor)]
+constraintKh :: [(String, String, World -> World -> Bool)]
+constraintKh = [("Kools", "horse", nextDoor), ("horse", "Kools", nextDoor)]
+constraintNb :: [(String, String, World -> World -> Bool)]
+constraintNb = [("Norwegian", "blue", nextDoor), ("blue", "Norwegian", nextDoor)]
+constraintsNeQ :: [(String, String, World -> World -> Bool)]
+constraintsNeQ = [(x, y, notEqual) | [x, y] <- nonEqualPairs] ++ [(x, y, notEqual) | [y, x] <- nonEqualPairs] ++ constraintGi ++ constraintCf ++ constraintKh ++ constraintNb
 
+constraints :: [(String, String, World -> World -> Bool)]
 constraints = constraintEq ++ constraintsNeQ ++ constraintUnique
 \end{code}
 
