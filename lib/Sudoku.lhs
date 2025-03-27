@@ -1,3 +1,5 @@
+\subsection{The Sudoku Library}\label{sec:sudoku}
+
 \begin{code}
 module Sudoku where
 
@@ -11,24 +13,21 @@ import AC3Solver ( AC3 (..), ac3, Arc, Domain )
 import Backtracking ( findSolution )
 
 \end{code}
-\subsection{The Sudoku Library}\label{sec:sudoku}
 
 This file implements Sudoku in a suitable format for our AC3 and backtracking algorithms.
 
 In our formulation:
-
-1. Each cell on the Sudoku board is represented as a \textit{Variable} with its associated domain
-   - A variable is identified by a coordinate $(i,j)$ where $i$ is the row $[1-9]$ and $j$ is the column $[1-9]$
-   - Each variable maintains a domain of possible values $[1-9]$
-
-2. Sudoku's rules are encoded as binary constraints between variables:
-\begin{itemize}
-    \item \textbf{Row constraint}: All cells in the same row must contain different values
-    \item \textbf{Column constraint}: All cells in the same column must contain different values
-    \item \textbf{Box constraint}: All cells in the same 3-by-3 box must contain different values
-\end{itemize}
-These constraints are implemented as inequality relations ($\neq$) between cells. For instance, cell $(3,2)$ 
-and cell $(3,7)$ are in the same row, thus, a constraint is added to ensure that they do not have the same value.
+\begin{enumerate}
+    \item Each cell on the Sudoku board is represented as a \textit{Variable} with its associated domain. A variable is identified by a coordinate $(i,j)$ where $i$ is the row $[1-9]$ and $j$ is the column $[1-9]$. Each variable maintains a domain of possible values $[1-9]$.
+    \item Sudoku's rules are encoded as binary constraints between variables:
+    \begin{itemize}
+        \item \textbf{Row constraint}: All cells in the same row must contain different values
+        \item \textbf{Column constraint}: All cells in the same column must contain different values
+        \item \textbf{Box constraint}: All cells in the same 3-by-3 box must contain different values
+    \end{itemize}
+    These constraints are implemented as inequality relations ($\neq$) between cells. For instance, cell $(3,2)$ 
+    and cell $(3,7)$ are in the same row, thus, a constraint is added to ensure that they do not have the same value.
+\end{enumerate}
 
 Below is the definition for a list of all cells, and the conditions for two cells being on the same row and
 in the same column.
@@ -48,7 +47,8 @@ A similar condition can be constructed for two cells being in the same 3-by-3 bo
 
 \begin{code}
 sameBox :: (Int, Int) -> (Int, Int) -> Bool
-sameBox (x1,y1) (x2,y2) = (x1 - 1) `div` 3 == (x2 - 1) `div` 3 && (y1 - 1) `div` 3 == (y2 - 1) `div` 3
+sameBox (x1,y1) (x2,y2) =   (x1 - 1) `div` 3 == (x2 - 1) `div` 3 && 
+                            (y1 - 1) `div` 3 == (y2 - 1) `div` 3
 \end{code}
 
 With these conditions, the constraints can be modelled as a list of inequalities between cells. Two cells receive
@@ -72,6 +72,7 @@ sudokuEmpty :: AC3 (Int, Int) Int
 sudokuEmpty = AC3 sudokuConstraints sudokuDomains
 \end{code}
 
+\hide{
 Using the `sudokuConstraints` as a backbone we can define our own sudoku puzzle. It is quite tedious because it 
 requires us to specify the initial grid. The example below is a Sudoku puzzle with a unique solution.
 
@@ -120,25 +121,28 @@ sudokuExampleUnique :: AC3 (Int, Int) Int
 sudokuExampleUnique = AC3 sudokuConstraints sudokuExampleDomainUnique
 
 \end{code}
+}
 
-Instead of specifying our own sudoku puzzles we can leverage the repository of \cite{ashing_jabenjysudoku}, in which 100+ puzzles are available. These puzzles are stored
+As opposed to specifying our own sudoku puzzles, we can leverage the repository of \cite{ashing_jabenjysudoku}, in which 100+ puzzles are available. These puzzles are stored
 as nine rows separated by a newline character, each row containing nine entries. Empty cells are represented by ".".
 
 \begin{code}
 readSudokuFromFile :: FilePath -> IO [Domain (Int, Int) Int]
-readSudokuFromFile filePath = do                -- | filePath is the path to the sudoku puzzle file
+readSudokuFromFile filePath = do -- filePath is the path to the sudoku puzzle file
     contents <- readFile filePath
     let rows = lines contents
     return (parseSudokuDomains rows)
 
+-- | Input is list of strings such as ["53..7....", "6..195...", ...]
 parseSudokuDomains :: [String] -> [Domain (Int, Int) Int]
 parseSudokuDomains rows = cellDomains where
-    charToDomain :: Char -> [Int]               -- | Converts characters to domain values
-    charToDomain '.' = [1..9]                   -- | Empty cell
-    charToDomain c = if c >= '1' && c <= '9'    -- | Should always be true if c!='.', added for safety
-                        then [read [c]]         -- | Fixed cell
-                        else [1..9]             -- | Empty cell
-    
+    -- | Assigns a character to its corresponding domain values
+    charToDomain :: Char -> [Int]               -- ^ Converts characters to domain values
+    charToDomain '.' = [1..9]                   -- ^ Empty cell
+    charToDomain c = if c >= '1' && c <= '9'    -- ^ Should always be true if c!='.', included for safety
+                        then [read [c]]         -- ^ Value of cell
+                        else [1..9]             -- ^ Empty cell
+
     cellDomains = [((i, j), charToDomain c) |
                   (i, row) <- zip [1..9] (take 9 rows),
                   (j, c) <- zip [1..9] (take 9 row)]
@@ -149,7 +153,7 @@ Leveraging these functions we can load a sudoku puzzle by specifying its name an
 
 \begin{code}
 loadSudokuPuzzle :: String -> IO (AC3 (Int, Int) Int)
-loadSudokuPuzzle fileName = do                  -- | fileName is the name of the sudoku puzzle
+loadSudokuPuzzle fileName = do -- fileName is the name of the sudoku puzzle
     let filePath = "sudokuPuzzles/" ++ fileName ++ ".sud"
     cellDomains <- readSudokuFromFile filePath
     return (AC3 sudokuConstraints cellDomains)
@@ -159,17 +163,18 @@ With the tools above, we can finally define a few different functions that the u
 need a function that loads a sudoku puzzle from its file name, runs AC3, and returns the puzzle with its reduced domains.
 
 \begin{code}
+-- | Input should be a string such as "easy9"
 runAC3OnSudokuFile :: String -> IO (AC3 (Int, Int) Int)
 runAC3OnSudokuFile fileName = do
-    puzzle <- loadSudokuPuzzle fileName         -- | Load sudoku puzzle from file name         
+    puzzle <- loadSudokuPuzzle fileName         -- ^ Load sudoku puzzle from file name         
     putStrLn "Initial puzzle:"
-    printSudokuPuzzle puzzle                    -- | Display the initial puzzle
+    printSudokuPuzzle puzzle                    -- ^ Display the initial puzzle
 
-    putStrLn "Running AC3..."                   -- | Run AC3 and create a new puzzle with reduced domains
+    putStrLn "Running AC3..."                   -- ^ Run AC3 and create a new puzzle with reduced domains
     let reducedDomain = ac3 puzzle
     let reducedPuzzle = AC3 sudokuConstraints reducedDomain
 
-    let oldDomain = getDomains puzzle           -- | Display the average domain size before and after running AC3
+    let oldDomain = getDomains puzzle           -- ^ Display the average domain size before and after running AC3
     let newDomain = getDomains reducedPuzzle
     let (beforeAC3, afterAC3) = computeDomainReduction oldDomain newDomain
     putStrLn "Average domain size"
@@ -184,15 +189,16 @@ harder puzzles. However, only getting the domain reduction is unsatisfactory, we
 The following function does just that by running the backtracking algorithm over the AC3 reduced puzzle.
 
 \begin{code}
+-- | Input should be a string such as "easy9"
 solveSudokuFromFile :: String -> IO ()
 solveSudokuFromFile fileName = do
-    reducedPuzzle <- runAC3OnSudokuFile fileName-- | Get the puzzle with reduced domains
+    reducedPuzzle <- runAC3OnSudokuFile fileName-- ^ Get the puzzle with reduced domains
 
-    putStrLn "Running backtracking..."          -- | Run backtracking to find a solution
+    putStrLn "Running backtracking..."          -- ^ Run backtracking to find a solution
     let solutions = findSolution reducedPuzzle
 
-    let solvedDomain = case solutions of        -- | Check for solutions, extract solved domain if found
-                  Nothing -> []                 -- | No solution found
+    let solvedDomain = case solutions of        -- ^ Check for solutions, extract solved domain if found
+                  Nothing -> []                 -- ^ No solution found
                   Just assignments -> [((row, col), [number]) | ((row, col), number) <- assignments]
     
     if null solvedDomain 
@@ -206,6 +212,8 @@ solveSudokuFromFile fileName = do
 With these function we can define the main loop that the user interacts with. It asks the user to choose a sudoku puzzle, and then runs AC3 and backtracking on it.
 The user can choose between easy, hard, and special puzzles. Easy and hard puzzles are chosen by number, while special puzzles are chosen by name. Each of these
 three cases are considered, and the user is prompted to choose again if an invalid choice is made.
+
+\hide{
 
 \begin{code}
 
@@ -224,33 +232,33 @@ sudokuMain = do
     fileName <- case diff of
 
         -- | Easy puzzle case
-        "1" -> do getEasyPuzzle where -- | Start the recursive prompt
+        "1" -> do getEasyPuzzle where -- ^ Start the recursive prompt
             getEasyPuzzle = do
                 putStr "Choose a puzzle number between 1 and 50: "
                 puzzleNum <- getLine
-                -- Check if input is a valid number in range
+                -- ^ Check if input is a valid number in range
                 case reads puzzleNum :: [(Int, String)] of
                     [(num, "")] | num >= 1 && num <= 50 -> 
                         return ("easy" ++ puzzleNum)
                     _ -> do
-                        putStrLn $ "Invalid choice. Please enter a number between 1 and 50."
-                        getEasyPuzzle -- | Try again
+                        putStrLn "Invalid choice. Please enter a number between 1 and 50."
+                        getEasyPuzzle -- ^ Try again
 
         -- | Hard puzzle case
-        "2" -> do getHardPuzzle where -- | Start the recursive prompt
+        "2" -> do getHardPuzzle where -- ^ Start the recursive prompt
             getHardPuzzle = do
                     putStr "Choose a puzzle number between 1 and 95: "
                     puzzleNum <- getLine
-                    -- Check if input is a valid number in range
+                    -- ^ Check if input is a valid number in range
                     case reads puzzleNum :: [(Int, String)] of
                         [(num, "")] | num >= 1 && num <= 95 -> 
                             return ("hard" ++ puzzleNum)
                         _ -> do
-                            putStrLn $ "Invalid choice. Please enter a number between 1 and 95."
-                            getHardPuzzle -- | Try again
+                            putStrLn "Invalid choice. Please enter a number between 1 and 95."
+                            getHardPuzzle -- ^ Try again
         
         -- | Special puzzle case
-        "3" -> do askForSpecialPuzzle where -- | Start the recursive prompt
+        "3" -> do askForSpecialPuzzle where -- ^ Start the recursive prompt
             askForSpecialPuzzle = do
                 putStr "Choose a puzzle: \n\
                     \  (1) impossible\n\
@@ -265,17 +273,17 @@ sudokuMain = do
                     "3" -> return "Times1"
                     _   -> do
                         putStrLn $ "Sorry, " ++ show puzzleName ++ " is not a valid choice. Please try again."
-                        askForSpecialPuzzle -- | Try again
+                        askForSpecialPuzzle -- ^ Try again
         
         -- | Invalid choice
         x -> do
             putStrLn $ "Sorry, " ++ show x ++ " is not a valid choice. Please try again."
-            sudokuMain  -- | Restart if invalid choice
-            return ""   -- | This line is dealt with below
+            sudokuMain  -- ^ Restart if invalid choice
+            return ""   -- ^ This line is dealt with below
 
-    if null fileName then return () -- | fileName is null after user executes case x, but the program has already successfully run
+    if null fileName then return () -- ^ fileName is null after user executes case x, but the program has already successfully run
     else do
-        -- | Solve the Sudoku puzzle from the file
+        -- ^ Solve the Sudoku puzzle from the file
         putStrLn $ "\nSolving Sudoku puzzle " ++ fileName ++ "..."
         solveSudokuFromFile fileName
 
@@ -289,7 +297,7 @@ showWelcomeMessage = do
     putStrLn ""
 
 \end{code}
-
+}
 
 
 

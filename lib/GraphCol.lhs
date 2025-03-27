@@ -311,7 +311,7 @@ benchmarkTests = mapM_ runBenchmark $ testFiles ++ testFilesComps ++ testFilesCo
 \end{code}
 } % \hide
 
-\subsubsection{Benchmarking GraphCol}
+\paragraph{Benchmarking GraphCol}~\\
 We set out to benchmark \verb:GraphCol: in 2 different ways: given an instance of \verb:GraphCol:, 
 first, we determine the total number of options across all domains in the instance, 
   and we compare this to the number of options once we have run \verb:ac3:. We then do the same 
@@ -390,6 +390,18 @@ reducing as a result of the reduced search space.
 
 % Leaving this out, both because the post AC-3 result is a bit weird, and cuz space.
 % The point is probably (hopefully?) clear... 
+
+Generally, it is tough to determine whether AC-3 provides much improvement to graph colouring. 
+Initially, we only have a limitation on vertex 0's colour being set to 0. 
+If we have 1 colour, then AC-3 can solve the instance: if we have 1 or more edges, then 
+the variables with not be 1-colourable.  
+If we have 2 colours, then AC-3 can assign colours to each vertex in the same component as 0.
+If this is not possible, then we can see that the graph is not 2-colourable. 
+
+However for larger N colours, or if the graph contains more than 1 component, 
+the only reduction that AC-3 can make is by removing the option for colour 0 for vertices 
+connected to vertex 0. Similar to the example mentioned in Section~\ref{sec:intro}, 
+AC-3 will not be able to remove options if both vertices have more than 1 colour possible.
 
 
 

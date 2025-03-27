@@ -1,20 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \input{latexmacros.tex}
 
-\title{Using AC-3 to come up with a good title}
+\title{General purpose AC-3 solver with various applications}
 \author{David Hildering \and Dennis Lindberg \and Joel Maxson \and Helen Sand \and Andy S. Tatman}
 \date{\today}
-\hypersetup{pdfauthor={David Hildering, Dennis Lindberg, Joel Maxson, Helen Sand, Andy S. Tatman}, pdftitle={Using AC-3 to come up with a good title}}
+\hypersetup{pdfauthor={David Hildering, Dennis Lindberg, Joel Maxson, Helen Sand, Andy S. Tatman}, pdftitle={General purpose AC-3 solver with various applications}}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-We give a toy example of a report in \emph{literate programming} style.
-The main advantage of this is that source code and documentation can
-be written and presented next to each other.
-We use the listings package to typeset Haskell source code nicely.
+% We give a toy example of a report in \emph{literate programming} style.
+% The main advantage of this is that source code and documentation can
+% be written and presented next to each other.
+% We use the listings package to typeset Haskell source code nicely.
+We have implemented the AC-3 algortihm described in~\cite{AC3} in Haskell, 
+as well as a backtracking method to allow us to solve general constraint satisfaction 
+problems. 
+We have also implemented a variety of NP-hard problems, and shown how we can apply 
+the AC-3 algorithm to them, with varying levels of effectiveness. 
 \end{abstract}
 
 \vfill
@@ -28,7 +33,7 @@ We use the listings package to typeset Haskell source code nicely.
 
 % \input{Howto.tex}
 
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 % DONE: What is AC-3, why use it (etc)...
 Many problems in computer science can be written as a set of possible values for each 
 body in the problem instance, and a set of restrictions, or constraints, between pairs of bodies.
@@ -84,12 +89,12 @@ These files form the basis of our implementation, which we then use to solve var
 
 \input{exec/Main.lhs}
 
-\section{The test file(s)}
+% \section{The test file(s)}
 
-\input{test/ac3Tests.lhs}
+% \input{test/ac3Tests.lhs}
 
 \input{Conclusion.tex}
-\section{Future works??}
+% \section{Future works??} %moved into conclusion
 
 \addcontentsline{toc}{section}{Bibliography}
 \bibliographystyle{alpha}
