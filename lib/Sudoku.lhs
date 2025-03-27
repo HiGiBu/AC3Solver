@@ -1,3 +1,5 @@
+\subsection{The Sudoku Library}\label{sec:sudoku}
+
 \begin{code}
 module Sudoku where
 
@@ -11,24 +13,21 @@ import AC3Solver ( AC3 (..), ac3, Arc, Domain )
 import Backtracking ( findSolution )
 
 \end{code}
-\subsection{The Sudoku Library}\label{sec:sudoku}
 
 This file implements Sudoku in a suitable format for our AC3 and backtracking algorithms.
 
 In our formulation:
-
-1. Each cell on the Sudoku board is represented as a \textit{Variable} with its associated domain
-   - A variable is identified by a coordinate $(i,j)$ where $i$ is the row $[1-9]$ and $j$ is the column $[1-9]$
-   - Each variable maintains a domain of possible values $[1-9]$
-
-2. Sudoku's rules are encoded as binary constraints between variables:
-\begin{itemize}
-    \item \textbf{Row constraint}: All cells in the same row must contain different values
-    \item \textbf{Column constraint}: All cells in the same column must contain different values
-    \item \textbf{Box constraint}: All cells in the same 3-by-3 box must contain different values
-\end{itemize}
-These constraints are implemented as inequality relations ($\neq$) between cells. For instance, cell $(3,2)$ 
-and cell $(3,7)$ are in the same row, thus, a constraint is added to ensure that they do not have the same value.
+\begin{enumerate}
+    \item Each cell on the Sudoku board is represented as a \textit{Variable} with its associated domain. A variable is identified by a coordinate $(i,j)$ where $i$ is the row $[1-9]$ and $j$ is the column $[1-9]$. Each variable maintains a domain of possible values $[1-9]$.
+    \item Sudoku's rules are encoded as binary constraints between variables:
+    \begin{itemize}
+        \item \textbf{Row constraint}: All cells in the same row must contain different values
+        \item \textbf{Column constraint}: All cells in the same column must contain different values
+        \item \textbf{Box constraint}: All cells in the same 3-by-3 box must contain different values
+    \end{itemize}
+    These constraints are implemented as inequality relations ($\neq$) between cells. For instance, cell $(3,2)$ 
+    and cell $(3,7)$ are in the same row, thus, a constraint is added to ensure that they do not have the same value.
+\end{enumerate}
 
 Below is the definition for a list of all cells, and the conditions for two cells being on the same row and
 in the same column.
@@ -242,7 +241,7 @@ sudokuMain = do
                     [(num, "")] | num >= 1 && num <= 50 -> 
                         return ("easy" ++ puzzleNum)
                     _ -> do
-                        putStrLn $ "Invalid choice. Please enter a number between 1 and 50."
+                        putStrLn "Invalid choice. Please enter a number between 1 and 50."
                         getEasyPuzzle -- ^ Try again
 
         -- | Hard puzzle case
@@ -255,7 +254,7 @@ sudokuMain = do
                         [(num, "")] | num >= 1 && num <= 95 -> 
                             return ("hard" ++ puzzleNum)
                         _ -> do
-                            putStrLn $ "Invalid choice. Please enter a number between 1 and 95."
+                            putStrLn "Invalid choice. Please enter a number between 1 and 95."
                             getHardPuzzle -- ^ Try again
         
         -- | Special puzzle case
