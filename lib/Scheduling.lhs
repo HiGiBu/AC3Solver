@@ -43,8 +43,8 @@ getUserInputs = do
   return (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames)
 
 readTextFile :: FilePath -> IO ([String], [String], [String], [String], [String])
-readTextFile filePath = do
-  content <- readFile filePath
+readTextFile path = do
+  content <- readFile path
   let linesOfFile = filter (not . null) (lines content)
 
   let (headerLines, rest1) = break (isPrefixOf "--- CONSTRAINTS ---") linesOfFile
@@ -223,44 +223,40 @@ printSolution classNames days roomNames timeSlotNames list = putStrLn $ concat
     " in " ++ roomNames !! roomId ++ " at " ++ timeSlotNames !! timeId ++ ".\n"
   | (agent, (dayId, timeId, roomId)) <- list]
 
-schedulingMain :: Maybe String -> IO ()
-schedulingMain Nothing = do
-  (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames) <- getUserInputs
-  constraints <- collectConstraints classNames
-  
-  let uniquenessConstraints = [(i, j, (/=)) | i <- [0..numClasses-1], j <- [0..numClasses-1], i /= j]
-  let allConstraints = constraints ++ uniquenessConstraints
-  let classDomains = [(i, [(d, t, r) | d <- [0..5], t <- [0..numTimeSlots-1], r <- [0..numRooms-1]]) | i <- [0..numClasses-1]]
-  domainConditions <- collectStartingValues classNames roomNames timeSlotNames
-  let filteredDomains = filterDomains classDomains domainConditions
+filePath :: Maybe String
+--filePath = Nothing
+filePath = Just "filePath"
 
-  let possibleSolutions = ac3 AC3 { cons = allConstraints, domains = filteredDomains }
+schedulingMain :: IO ()
+schedulingMain = case filePath of 
+  Nothing -> do
+    (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames) <- getUserInputs
+    constraints <- collectConstraints classNames
+    let uniquenessConstraints = [(i, j, (/=)) | i <- [0..numClasses-1], j <- [0..numClasses-1], i /= j]
+    let allConstraints = constraints ++ uniquenessConstraints
+    let classDomains = [(i, [(d, t, r) | d <- [0..5], t <- [0..numTimeSlots-1], r <- [0..numRooms-1]]) | i <- [0..numClasses-1]]
+    domainConditions <- collectStartingValues classNames roomNames timeSlotNames
+    let filteredDomains = filterDomains classDomains domainConditions
+    let possibleSolutions = ac3 AC3 { cons = allConstraints, domains = filteredDomains }
+    let solution = findSolution AC3 { cons = allConstraints, domains = possibleSolutions }
+    case solution of
+      Nothing -> putStrLn "No solution found."
+      Just sol -> printSolution classNames dayNames roomNames timeSlotNames sol
 
-  let solution = findSolution AC3 { cons = allConstraints, domains = possibleSolutions }
-
-  case solution of
-    Nothing -> putStrLn "No solution found."
-    Just sol -> printSolution classNames dayNames roomNames timeSlotNames sol
-
-schedulingMain (Just filepath) = do
-  (classNames, roomNames, timeSlotNames, fileConstraints, fileStartingValues) <- readTextFile filepath
-  constraints <- getFileConstraints classNames roomNames timeSlotNames fileConstraints
-  startingValues <- getFileStartingValues classNames roomNames timeSlotNames fileStartingValues
-
-  let numClasses = length classNames
-  let numRooms = length roomNames
-  let numTimeSlots = length timeSlotNames
-
-  let uniquenessConstraints = [(i, j, (/=)) | i <- [0..numClasses-1], j <- [0..numClasses-1], i /= j]
-  let allConstraints = constraints ++ uniquenessConstraints
-  let classDomains = [(i, [(d, t, r) | d <- [0..5], t <- [0..numTimeSlots-1], r <- [0..numRooms-1]]) | i <- [0..numClasses-1]]
-  let filteredDomains = filterDomains classDomains startingValues
-
-  let possibleSolutions = ac3 AC3 { cons = allConstraints, domains = filteredDomains }
-
-  let solution = findSolution AC3 { cons = allConstraints, domains = possibleSolutions }
-
-  case solution of
+  Just path -> do
+    (classNames, roomNames, timeSlotNames, fileConstraints, fileStartingValues) <- readTextFile path
+    constraints <- getFileConstraints classNames roomNames timeSlotNames fileConstraints
+    startingValues <- getFileStartingValues classNames roomNames timeSlotNames fileStartingValues
+    let numClasses = length classNames
+    let numRooms = length roomNames
+    let numTimeSlots = length timeSlotNames
+    let uniquenessConstraints = [(i, j, (/=)) | i <- [0..numClasses-1], j <- [0..numClasses-1], i /= j]
+    let allConstraints = constraints ++ uniquenessConstraints
+    let classDomains = [(i, [(d, t, r) | d <- [0..5], t <- [0..numTimeSlots-1], r <- [0..numRooms-1]]) | i <- [0..numClasses-1]]
+    let filteredDomains = filterDomains classDomains startingValues
+    let possibleSolutions = ac3 AC3 { cons = allConstraints, domains = filteredDomains }
+    let solution = findSolution AC3 { cons = allConstraints, domains = possibleSolutions }
+    case solution of
       Nothing -> putStrLn "No solution found."
       Just sol -> printSolution classNames dayNames roomNames timeSlotNames sol
 
