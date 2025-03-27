@@ -23,9 +23,9 @@ possible: if at least 1 variable has an empty domain, then there will never be a
 
 \begin{code}
 
---Returns true iff at least 1 variable has an empty domain.
---Post: Returns true -> \not \exist a solution. 
---      However, returns false does NOT guarantee that a solution exists.
+-- |Returns true iff at least 1 variable has an empty domain.
+-- | Post: Returns true -> \not \exist a solution. 
+-- |       However, returns false does NOT guarantee that a solution exists.
 determineNoSol :: [Domain a b] -> Bool 
 determineNoSol = any (\(_,ds) -> null ds) 
 
@@ -74,11 +74,11 @@ As with \verb:findSolution:, \verb:findAllSolutions: returns the (possibly empty
 
 \begin{code}
 
--- find all
+-- | find all solutions
 findAllSolutions :: Eq a => AC3 a b -> [[Assignment a b]]
 findAllSolutions (AC3 c d) = helpFSAll c d []
 
--- helper function for find all
+-- | helper function for findAllSolutions
 helpFSAll :: Eq a => [Arc a b] -> [Domain a b] -> [Assignment a b] -> [[Assignment a b]]
 helpFSAll _ [] as = [as]  -- Found a complete solution
 helpFSAll constrs ((x, ds):dss) as = concatMap recurseFS ds where
@@ -106,13 +106,13 @@ Help-functions used by our solution methods.
 
 \begin{code}
 
--- Find whether variable Y has an assignment.
+-- | Find whether variable Y has an assignment.
 elemAs :: Eq a => Variable a -> [Assignment a b] -> Bool 
 elemAs _ [] = False
 elemAs y ((x,_):as) = x==y || y `elemAs` as 
 
--- Find variable Y's assigned value
--- PRE: y \in as.
+-- | Find variable Y's assigned value
+-- | PRE: y \in as.
 valY :: Eq a => Variable a -> [Assignment a b] -> b 
 valY _ [] = error "Y's value could not be found in the assignment." -- should not happen.
 valY y ((x,b):as) = if x == y then b else valY y as
