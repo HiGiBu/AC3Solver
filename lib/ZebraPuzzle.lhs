@@ -5,7 +5,7 @@ import AC3Solver
 \end{code}}
 \subsection{Zebra Puzzle}
 Other types of problems can be solved using the AC3 algorithm. The Zebra Puzzle, a well known logic puzzle shown below, is an example:
-\begin{quote}
+\begin{verbatim}
 There are five houses.
 The Englishman lives in the red house.
 The Spaniard owns the dog.
@@ -21,7 +21,8 @@ The green house is immediately to the right of the ivory house.
 The man who smokes Chesterfields lives in the house next to the man with the fox.
 Kools are smoked in the house next to the house where the horse is kept.
 The Norwegian lives next to the blue house
-\end{quote}
+\end{verbatim}
+Setting up the variables and the domain.
 \begin{code}
 houses :: [String]
 houses = ["1", "2", "3", "4", "5"]
@@ -59,6 +60,7 @@ d = domainH ++ domainC ++ domainD ++ domainS ++ domainP ++ domainN
 
 \end{code}
 
+\hide{
 \begin{code}
 ints :: Eq a => [a] -> [a] -> [a]
 ints xs ys = filter (`elem` ys) xs
@@ -75,25 +77,30 @@ greenIvory (x, _, _, _, _, _) (y, _, _, _, _, _) = (x, y) == ("1", "2") || (x, y
 
 nextDoor :: World ->  World -> Bool
 nextDoor (x, _, _, _, _, _) (y, _, _, _, _, _) = checkDistance x y == 1
+\end{code}}
 
-
-validity :: World ->  World -> Bool
-validity (h, c, dr, s, p, n) _ =   all ((\ x -> null x || (length x == 2)) . (`ints` [h, c, dr, s, p, n])) equalPairs
-validityN :: World ->  World -> Bool
-validityN (h, c, dr, s, p, n) _ =   all ((\ x -> length x /= 2) . (`ints` [h, c, dr, s, p, n])) nonEqualPairs
-
+Only keep the valid parts of the domain. (This is cheating a little as it is not really arc consistency, but it is using that program.)
+\begin{code}
 nonEqualPairs :: [[String]]
 nonEqualPairs = [["Chesterfields", "fox"], ["Kools", "horse"], ["Norwegian", "blue"], ["green", "ivory"]]
 
 equalPairs :: [[String]]
 equalPairs = [["Englishman", "red"], ["Spaniard", "dog"], ["coffee", "green"], ["Ukrainian", "tea"], ["Old Gold", "snails"], ["Kools", "yellow"], ["milk", "3"], ["Norwegian", "1"], ["Lucky Strike", "orange juice"], ["Japanese", "Parliaments"]]
 
+validity :: World ->  World -> Bool
+validity (h, c, dr, s, p, n) _ =   all ((\ x -> null x || (length x == 2)) . (`ints` [h, c, dr, s, p, n])) equalPairs
+validityN :: World ->  World -> Bool
+validityN (h, c, dr, s, p, n) _ =   all ((\ x -> length x /= 2) . (`ints` [h, c, dr, s, p, n])) nonEqualPairs
+
+
 constraintVal :: [(String, String,   World  -> World -> Bool)]
 constraintVal = [(x, y, validity) | x <- agents, y <- agents, x /= y]
 
 constraintValN :: [(String, String,   World   -> World -> Bool)]
 constraintValN = [(x, y, validityN) | x <- agents, y <- agents, x /= y]
-
+\end{code}
+Constraints for equality, uniqueness, and nonequality.
+\begin{code}
 constraintEq :: [(String, String,   World   -> World -> Bool)]
 constraintEq = [(x, y, (==)) | [x, y] <- equalPairs] ++ [(x, y, (==)) | [y, x] <- equalPairs]
 constraintUnique :: [(String, String, World -> World -> Bool)]
@@ -112,7 +119,7 @@ constraintsNeQ = [(x, y, notEqual) | [x, y] <- nonEqualPairs] ++ [(x, y, notEqua
 constraints :: [(String, String, World -> World -> Bool)]
 constraints = constraintEq ++ constraintsNeQ ++ constraintUnique
 \end{code}
-
+Finally running the code to solve the puzzle.
 \begin{code}
 
 zebraPuzzleMain :: IO ()
