@@ -1,5 +1,10 @@
 \subsection{The Scheduling library}\label{sec:Scheduling}
 
+This module uses the AC3 algorithm to solve timetable scheduling problems. The user can input the variables and contraints by using either 
+a parser or loading the problem from a text file. The programm then prints a day, room and time assignment for each course that needed to 
+be scheduled.
+
+\hide{
 \begin{code}
 
 module Scheduling where
@@ -15,7 +20,21 @@ import Data.Char (toLower)
 type ClassAssignment = (Int, Int, Int)
 dayNames :: [String]
 dayNames = ["monday", "tuesday", "wednesday", "thursday", "friday"]
+\end{code}}
 
+The choice of input method is made by setting the variable filePath to either "Nothing" for the parser or to a "Just String" containing 
+the path of the input file.
+
+\begin{code}
+filePath :: Maybe String
+filePath = Nothing
+--filePath = Just "filePath"
+\end{code}
+
+If the user chooses to use the parser they will be prompted to type both the total number and names of the given courses, rooms and time slots.
+Moreover it is assumed that the courses can be scheduled monday to friday and that each class will occupy one time slot.
+
+\begin{code}
 parseInt :: Parser Int
 parseInt = do
   spaces
@@ -41,7 +60,29 @@ getUserInputs = do
   numTimeSlots <- parseInput "Enter the number of time slots per day:"
   timeSlotNames <- getNames "Enter time slot names:" numTimeSlots
   return (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames)
+\end{code}
 
+If the user loads the problem from a text file the programm will immediatly return a solution without user prompts. 
+The file needs to contain two delimiters to seperate the variable names from the constraints and starting values. 
+A valid input file might look like this:
+
+class1 class2 class3 class4
+room1 room2 room3 room4
+9am 10am 11am 12pm 1pm
+--- CONSTRAINTS ---
+class1 is before class2
+class2 is at the same time as class3
+class3 is in the same room as class4
+class1 is not the same day as class3
+class2 is not at the same time as class4
+class4 is not in the same room as class1
+--- STARTING VALUES ---
+class1 is in room1
+class2 is at 10am
+class3 is on monday
+class4 is in room4
+
+\begin{code}
 readTextFile :: FilePath -> IO ([String], [String], [String], [String], [String])
 readTextFile path = do
   content <- readFile path
@@ -59,7 +100,10 @@ readTextFile path = do
         let timeSlotNames = words timeSlotNamesLine
         return (classNames, roomNames, timeSlotNames, constraintLines, tail rest2)
       _ -> error "Invalid header format."
+\end{code}
 
+\hide{
+\begin{code}
 testUserInputs :: IO ()
 testUserInputs = do
   (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames) <- getUserInputs
@@ -108,13 +152,20 @@ checkRoom a (_,_,x) = x == a
 filterDomains :: [Domain Int ClassAssignment] -> [(Variable Int, ClassAssignment -> Bool)] -> [Domain Int ClassAssignment]
 filterDomains domainList conditions =
     [(agent, [v | v <- values, all (\(a, f) -> (a /= agent) || f v) conditions]) | (agent, values) <- domainList]
+\end{code}
+}
 
+The parser for the constraints runs until the user types "Done". Possible constraints are: "is the same day as",
+"is in the same room as", "is at the same time as" and the corresponding negations. Additionally there is "is before" which defines
+that two classes are in two adjacent time slots on the same day.
+
+\begin{code}
 getConstraint :: [String] -> IO (Maybe [Arc Int ClassAssignment])
 getConstraint classNames = do
   putStrLn "Enter a constraint (e.g., 'class1 is before class2', 'class1 is the same day as class2', 'class1 is in the same room as class2' or 'class1 is not at the same time as class2'). Type 'Done' to finish:"
   input <- getLine
   let parts = map (map toLower) (words input)
-  if input == "Done"|| input == "done" then return Nothing else do
+  if input == "Done" || input == "done" then return Nothing else do
     case parts of
       [class1, "is", "before", class2] -> Just <$> processConstraints class1 class2 "is before" classNames
       [class1, "is", "the", "same", "day", "as", class2] -> Just <$> processConstraints class1 class2 "is the same day as" classNames
@@ -126,19 +177,6 @@ getConstraint classNames = do
       _ -> do
         putStrLn "Invalid input format"
         getConstraint classNames
-
-getFileConstraints :: [String] -> [String] -> [String] -> [String] -> IO [Arc Int ClassAssignment]
-getFileConstraints classNames _ _ constraints = do
-    let processLine line = case words line of
-            [class1, "is", "before", class2] -> processConstraints class1 class2 "is before" classNames
-            [class1, "is", "the", "same", "day", "as", class2] -> processConstraints class1 class2 "is the same day as" classNames
-            [class1, "is", "at", "the", "same", "time", "as", class2] -> processConstraints class1 class2 "is at the same time as" classNames
-            [class1, "is", "in", "the", "same", "room", "as", class2] -> processConstraints class1 class2 "is in the same room as" classNames
-            [class1, "is", "not", "the", "same", "day", "as", class2] -> processConstraints class1 class2 "is not the same day as" classNames
-            [class1, "is", "not", "at", "the", "same", "time", "as", class2] -> processConstraints class1 class2 "is not at the same time as" classNames
-            [class1, "is", "not", "in", "the", "same", "room", "as", class2] -> processConstraints class1 class2 "is not in the same room as" classNames
-            _ -> error "Invalid constraint format"
-    concat <$> mapM processLine constraints
 
 processConstraints :: String -> String -> String -> [String] -> IO [Arc Int ClassAssignment]
 processConstraints class1 class2 keyword classNames = do
@@ -164,12 +202,33 @@ collectConstraints classNames = do
           Nothing -> return acc
           Just cs  -> loop (cs ++ acc)
   loop []
+\end{code}
 
+The same constraints can also be loaded from file. They have to be preceded by the delimiter "--- CONSTRAINTS ---".
+
+\begin{code}
+getFileConstraints :: [String] -> [String] -> [String] -> [String] -> IO [Arc Int ClassAssignment]
+getFileConstraints classNames _ _ constraints = do
+    let processLine line = case words line of
+            [class1, "is", "before", class2] -> processConstraints class1 class2 "is before" classNames
+            [class1, "is", "the", "same", "day", "as", class2] -> processConstraints class1 class2 "is the same day as" classNames
+            [class1, "is", "at", "the", "same", "time", "as", class2] -> processConstraints class1 class2 "is at the same time as" classNames
+            [class1, "is", "in", "the", "same", "room", "as", class2] -> processConstraints class1 class2 "is in the same room as" classNames
+            [class1, "is", "not", "the", "same", "day", "as", class2] -> processConstraints class1 class2 "is not the same day as" classNames
+            [class1, "is", "not", "at", "the", "same", "time", "as", class2] -> processConstraints class1 class2 "is not at the same time as" classNames
+            [class1, "is", "not", "in", "the", "same", "room", "as", class2] -> processConstraints class1 class2 "is not in the same room as" classNames
+            _ -> error "Invalid constraint format"
+    concat <$> mapM processLine constraints
+\end{code}
+
+The user can also enter any room, time and day values that are already known. The possible keywords are: "is in", "is at" and "is on".
+
+\begin{code}
 getStartingValues :: [String] -> [String] -> [String] -> IO (Maybe (Variable Int, ClassAssignment -> Bool))
 getStartingValues classNames roomNames timeslotNames = do
   putStrLn "Enter known values (e.g., 'class1 is in room3', 'class1 is at 11am' or 'class1 is on monday'). Type 'Done' to finish:"
   input <- getLine
-  if input == "Done" then return Nothing else do
+  if input == "Done" || input == "done" then return Nothing else do
     let parts = words input
     case parts of
       [class1, "is", "in", room] -> Just <$> processStartingValues class1 room "is in" classNames roomNames
@@ -178,15 +237,6 @@ getStartingValues classNames roomNames timeslotNames = do
       _ -> do
         putStrLn "Invalid input format"
         getStartingValues classNames roomNames timeslotNames
-
-getFileStartingValues :: [String] -> [String] -> [String] -> [String] -> IO [(Variable Int, ClassAssignment -> Bool)]
-getFileStartingValues classNames roomNames timeslotNames startValues = do
-  let processLine line = case words line of
-            [class1, "is", "in", room] -> processStartingValuesFile class1 room "is in" classNames roomNames
-            [class1, "is", "at", time] -> processStartingValuesFile class1 time "is at" classNames timeslotNames
-            [class1, "is", "on", day] -> processStartingValuesFile class1 day "is on" classNames dayNames
-            _ -> error "Invalid starting value format"
-  concat <$> mapM processLine startValues
 
 processStartingValues :: String -> String -> String -> [String] -> [String] -> IO (Variable Int, ClassAssignment -> Bool)
 processStartingValues class1 value keyword classNames valueNames = do
@@ -198,6 +248,28 @@ processStartingValues class1 value keyword classNames valueNames = do
       _           -> error "Invalid keyword"
     _ -> error "Invalid name"
 
+collectStartingValues :: [String] -> [String] -> [String] -> IO [(Variable Int, ClassAssignment -> Bool)]
+collectStartingValues classNames roomNames timeslotNames = do
+  let loop acc = do
+        value <- getStartingValues classNames roomNames timeslotNames
+        case value of
+          Nothing -> return acc
+          Just svs  -> loop (svs : acc)
+  loop []
+\end{code}
+
+If the starting values are loaded from file they have to be preceded by the delimiter "--- STARTING VALUES ---".
+
+\begin{code}
+getFileStartingValues :: [String] -> [String] -> [String] -> [String] -> IO [(Variable Int, ClassAssignment -> Bool)]
+getFileStartingValues classNames roomNames timeslotNames startValues = do
+  let processLine line = case words line of
+            [class1, "is", "in", room] -> processStartingValuesFile class1 room "is in" classNames roomNames
+            [class1, "is", "at", time] -> processStartingValuesFile class1 time "is at" classNames timeslotNames
+            [class1, "is", "on", day] -> processStartingValuesFile class1 day "is on" classNames dayNames
+            _ -> error "Invalid starting value format"
+  concat <$> mapM processLine startValues
+
 processStartingValuesFile :: String -> String -> String -> [String] -> [String] -> IO [(Variable Int, ClassAssignment -> Bool)]
 processStartingValuesFile class1 value keyword classNames valueNames = do
   case (elemIndex class1 classNames, elemIndex value valueNames) of
@@ -207,26 +279,24 @@ processStartingValuesFile class1 value keyword classNames valueNames = do
       "is on" -> return [(i, checkDay j)]
       _ -> error "Invalid keyword"
     _ -> error "Invalid name"
+\end{code}
 
-collectStartingValues :: [String] -> [String] -> [String] -> IO [(Variable Int, ClassAssignment -> Bool)]
-collectStartingValues classNames roomNames timeslotNames = do
-  let loop acc = do
-        value <- getStartingValues classNames roomNames timeslotNames
-        case value of
-          Nothing -> return acc
-          Just svs  -> loop (svs : acc)
-  loop []
-
+\hide{
+\begin{code}
 printSolution :: [String] -> [String] -> [String] -> [String] -> [(Variable Int, ClassAssignment)] -> IO ()
 printSolution classNames days roomNames timeSlotNames list = putStrLn $ concat
   [classNames !! agent ++ " is scheduled on " ++ days !! dayId ++
     " in " ++ roomNames !! roomId ++ " at " ++ timeSlotNames !! timeId ++ ".\n"
   | (agent, (dayId, timeId, roomId)) <- list]
+\end{code}
+}
 
-filePath :: Maybe String
-filePath = Nothing
---filePath = Just "filePath"
+The main function collects all the variables and constraints. Additionally it adds a uniqueness constraints to make sure that
+no two courses are in the same room at the same time. The  function then generates the possible domains for all variables and filters
+them by the known values that the user entered. The filtered domains and constraints are passed to the AC3 algorithm which reduces
+the domains. Finally backtracking is used to either find a possible solution or output an error message if it doesn't exist.
 
+\begin{code}
 schedulingMain :: IO ()
 schedulingMain = case filePath of 
   Nothing -> do
@@ -259,5 +329,4 @@ schedulingMain = case filePath of
     case solution of
       Nothing -> putStrLn "No solution found."
       Just sol -> printSolution classNames dayNames roomNames timeSlotNames sol
-
 \end{code}
