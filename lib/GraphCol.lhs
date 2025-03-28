@@ -308,6 +308,10 @@ testFilesComps3 = map ("graphcolInstances/"++)
 
 benchmarkTests :: IO ()
 benchmarkTests = mapM_ runBenchmark $ testFiles ++ testFilesComps ++ testFilesComps3 ++ ["graphcolInstances/n10e40nc3_Neg.txt"]
+
+-- NOTE: You can also run "stack bench" to run the benchmark for the larger examples.
+--        We leave it out here, as compiling these large examples is *very* slow.
+
 \end{code}
 } % \hide
 

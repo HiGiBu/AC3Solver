@@ -1,8 +1,11 @@
 
-\section{Wrapping it up in an exectuable}\label{sec:Main}
+\section{Running the executable}\label{sec:Main}
 
 % We will now use the library form Section \ref{sec:Basics} in a program.
-TODO
+% TODO
+By running \verb:stack exec myprogram:, we can run the main programme. 
+Here, we can choose which problem instance to work on, at which point the user is 
+sent to the main function for the chosen problem.
 
 \begin{code}
 module Main where
@@ -35,13 +38,7 @@ getChoice = do
 
 main :: IO ()
 main = do
-  putStrLn "Hello!"
-  --print somenumbers
-  --print (map funnyfunction somenumbers)
-  --myrandomnumbers <- randomnumbers
-  --print myrandomnumbers
-  --print (map funnyfunction myrandomnumbers)
-  --putStrLn "GoodBye"
+  putStrLn "Welcome to our AC-3 solver."
 
   -- Get choice
   choice <- getChoice
@@ -55,10 +52,10 @@ main = do
 
 \end{code}
 
-We can run this program with the commands:
+% We can run this program with the commands:
 
-\begin{verbatim}
-stack build
-stack exec myprogram
-\end{verbatim}
+% \begin{verbatim}
+% stack build
+% stack exec myprogram
+% \end{verbatim}
 
