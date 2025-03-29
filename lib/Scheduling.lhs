@@ -1,7 +1,7 @@
 \subsection{The Scheduling library}\label{sec:Scheduling}
 
 This module uses the AC3 algorithm to solve timetable scheduling problems. The user can input the variables and contraints by using either 
-a parser or loading the problem from a text file. The programm then prints a day, room and time assignment for each course that needed to 
+a parser or loading the problem from a text file. The programme then prints a day, room and time assignment for each course that needed to 
 be scheduled.
 
 \hide{
@@ -22,8 +22,8 @@ dayNames :: [String]
 dayNames = ["monday", "tuesday", "wednesday", "thursday", "friday"]
 \end{code}}
 
-The choice of input method is made by setting the variable filePath to either "Nothing" for the parser or to a "Just String" containing 
-the path of the input file.
+The choice of input method is made by setting the variable filePath to either "Nothing" for the parser or to a "Just [string]" containing 
+the path of the input file. % Andy: Added the [], and removed the cap, to make it clear we don't mean the *type* String.
 
 \begin{code}
 filePath :: Maybe String
@@ -31,8 +31,8 @@ filePath = Nothing
 --filePath = Just "filePath"
 \end{code}
 
-If the user chooses to use the parser they will be prompted to type both the total number and names of the given courses, rooms and time slots.
-Moreover it is assumed that the courses can be scheduled monday to friday and that each class will occupy one time slot.
+If the user chooses to use the parser, then they will be prompted to type both the total number and names of the given courses, rooms and time slots.
+Moreover, it is assumed that the courses can be scheduled Monday to Friday, and that each class will occupy one time slot.
 
 \begin{code}
 parseInt :: Parser Int
@@ -62,10 +62,10 @@ getUserInputs = do
   return (numClasses, numRooms, numTimeSlots, classNames, roomNames, timeSlotNames)
 \end{code}
 
-If the user loads the problem from a text file the programm will immediatly return a solution without user prompts. 
+If the user loads the problem from a text file, then the programme will immediately return a solution without user prompts. 
 The file needs to contain two delimiters to seperate the variable names from the constraints and starting values. 
 A valid input file might look like this:
-
+\begin{verbatim}
 class1 class2 class3 class4
 room1 room2 room3 room4
 9am 10am 11am 12pm 1pm
@@ -81,6 +81,7 @@ class1 is in room1
 class2 is at 10am
 class3 is on monday
 class4 is in room4
+\end{verbatim}
 
 \begin{code}
 readTextFile :: FilePath -> IO ([String], [String], [String], [String], [String])
@@ -156,7 +157,7 @@ filterDomains domainList conditions =
 }
 
 The parser for the constraints runs until the user types "Done". Possible constraints are: "is the same day as",
-"is in the same room as", "is at the same time as" and the corresponding negations. Additionally there is "is before" which defines
+"is in the same room as", "is at the same time as" and the corresponding negations. Additionally there is "is before", which defines
 that two classes are in two adjacent time slots on the same day.
 
 \begin{code}
@@ -222,6 +223,7 @@ getFileConstraints classNames _ _ constraints = do
 \end{code}
 
 The user can also enter any room, time and day values that are already known. The possible keywords are: "is in", "is at" and "is on".
+% Andy: What does this also refer to?
 
 \begin{code}
 getStartingValues :: [String] -> [String] -> [String] -> IO (Maybe (Variable Int, ClassAssignment -> Bool))
@@ -258,7 +260,7 @@ collectStartingValues classNames roomNames timeslotNames = do
   loop []
 \end{code}
 
-If the starting values are loaded from file they have to be preceded by the delimiter "--- STARTING VALUES ---".
+If the starting values are loaded from file, then they have to be preceded by the delimiter "--- STARTING VALUES ---".
 
 \begin{code}
 getFileStartingValues :: [String] -> [String] -> [String] -> [String] -> IO [(Variable Int, ClassAssignment -> Bool)]
@@ -291,10 +293,14 @@ printSolution classNames days roomNames timeSlotNames list = putStrLn $ concat
 \end{code}
 }
 
-The main function collects all the variables and constraints. Additionally it adds a uniqueness constraints to make sure that
-no two courses are in the same room at the same time. The  function then generates the possible domains for all variables and filters
-them by the known values that the user entered. The filtered domains and constraints are passed to the AC3 algorithm which reduces
-the domains. Finally backtracking is used to either find a possible solution or output an error message if it doesn't exist.
+The main function collects all the variables and constraints. Additionally, it adds a uniqueness constraints to make sure that
+no two courses are in the same room at the same time. 
+% Andy: which function? (Left blank) -> I have *guessed* at filteredDomains
+The \verb:filteredDomains: function then generates the possible domains for all variables and filters
+them by the known values that the user entered. 
+The filtered domains and constraints are passed to the AC-3 algorithm which reduces
+the domains. 
+Finally, backtracking is used to either find a possible solution or output an error message if no solution exists.
 
 \begin{code}
 schedulingMain :: IO ()
