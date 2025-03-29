@@ -7,6 +7,7 @@ module Sudoku where
 import Data.List ( intercalate )
 import Data.Time.Clock ( getCurrentTime, diffUTCTime )
 import Text.Printf ( printf )
+import System.IO (hFlush, stdout)
 
 -- Import AC3 solver and backtracking algorithm
 import AC3Solver ( AC3 (..), ac3, Arc, Domain )
@@ -14,16 +15,18 @@ import Backtracking ( findSolution )
 
 \end{code}
 
-This file implements Sudoku in a suitable format for our AC3 and backtracking algorithms.
+Sudoku is a popular puzzle that consists of a 9-by-9 grid, divided into 3-by-3 boxes. The goal is to fill the grid with numbers from $1$ to $9$, such that each number appears exactly once in each row, column, and box.
+Parts of the implementation are hidden for sake of brevity, but the full code is available in the repository. 
+We will begin by defining the Sudoku board and its constraints. \\
 
 In our formulation:
 \begin{enumerate}
     \item Each cell on the Sudoku board is represented as a \textit{Variable} with its associated domain. A variable is identified by a coordinate $(i,j)$ where $i$ is the row $[1-9]$ and $j$ is the column $[1-9]$. Each variable maintains a domain of possible values $[1-9]$.
     \item Sudoku's rules are encoded as binary constraints between variables:
     \begin{itemize}
-        \item \textbf{Row constraint}: All cells in the same row must contain different values
-        \item \textbf{Column constraint}: All cells in the same column must contain different values
-        \item \textbf{Box constraint}: All cells in the same 3-by-3 box must contain different values
+        \item \textbf{Row constraint}: Two cells in the same row must have different values
+        \item \textbf{Column constraint}: Two cells in the same column must have different values
+        \item \textbf{Box constraint}: Two cells in the same 3-by-3 box must have different values
     \end{itemize}
     These constraints are implemented as inequality relations ($\neq$) between cells. For instance, cell $(3,2)$ 
     and cell $(3,7)$ are in the same row, thus, a constraint is added to ensure that they do not have the same value.
@@ -123,6 +126,8 @@ sudokuExampleUnique = AC3 sudokuConstraints sudokuExampleDomainUnique
 \end{code}
 }
 
+\subsubsection{Loading Sudoku Puzzles}
+
 As opposed to specifying our own sudoku puzzles, we can leverage the repository of \cite{ashing_jabenjysudoku}, in which 100+ puzzles are available. These puzzles are stored
 as nine rows separated by a newline character, each row containing nine entries. Empty cells are represented by ".".
 
@@ -209,14 +214,48 @@ solveSudokuFromFile fileName = do
             printSudokuPuzzle solvedPuzzle
 \end{code}
 
+\subsubsection{Benchmarking AC3 for Sudoku}
+
+We could not include a benchmark for solving Sudoku puzzles with and without AC3, as it took too long without it. When we tried to run backtracking on puzzles without first reducing the domains using AC3, it could not solve easy Sudoku puzzles within an hour. As seen in table \ref{tab:ac3_comparison}, before applying AC3, there are on average $10^{49}$ number of board configurations for an easy Sudoku puzzle, and $10^{57}$ for a hard puzzle. As backtracking makes random guesses in this vast search space, it becomes unpractical. However, when paired with AC3 it can solve both easy and hard puzzles within minutes. \\
+
+AC3 turns out to be an effective way to significantly reduce the domain size of Sudoku puzzles. It never took more than a couple of seconds to run, and consistently removes 3-4 alternatives from each cell on average, as seen in figure \ref{fig:domainSizeReduction}. Notably, AC3 manages to \textit{solve} a handful of easy puzzles by reducing the average domain size to one, a surprising feat given that AC3 is not meant to generate solutions. However, this was not the case for
+any of the harder puzzles. \\ 
+
+
+\begin{table}[h]
+    \centering
+    \caption{\textit{The Number of Board Combinations Before and After AC3.}}
+    \begin{tabular}{lcccc}
+        \toprule
+        Puzzle Difficulty & \multicolumn{2}{c}{Easy} & \multicolumn{2}{c}{Hard} \\
+        \cmidrule(lr){2-5}
+        & M & SD & M & SD \\
+        \midrule
+        Before AC3 & 49.64 & 3.50 & 57.44 & 3.11 \\
+        After AC3 & 19.38 & 11.80 & 36.95 & 4.25 \\
+        \bottomrule
+        \multicolumn{5}{p{8cm}}{\textit{Note.} Values are given in log base 10. M stands for mean and SD for standard deviation.}
+    \end{tabular}
+    \label{tab:ac3_comparison}
+\end{table}
+
+\begin{figure}[h]
+    \centering
+    \caption{\textit{Average Domain Size Before and After AC3.}}
+    \includegraphics[width=0.8\textwidth]{benchmark/Average domain size boxplot.pdf}
+    \label{fig:domainSizeReduction}
+\end{figure}
+
+\hide{
+
 With these function we can define the main loop that the user interacts with. It asks the user to choose a sudoku puzzle, and then runs AC3 and backtracking on it.
 The user can choose between easy, hard, and special puzzles. Easy and hard puzzles are chosen by number, while special puzzles are chosen by name. Each of these
 three cases are considered, and the user is prompted to choose again if an invalid choice is made.
 
-\hide{
 
 \begin{code}
 
+-- | The main interface interacting with the user
 sudokuMain :: IO ()
 sudokuMain = do
     showWelcomeMessage
@@ -224,9 +263,10 @@ sudokuMain = do
     putStr "Choose your difficulty: \n\
          \  (1) easy\n\
          \  (2) hard\n\
-         \  (3) special\n"
-    
-    putStr "\nSelect one of (1, 2, 3): "
+         \  (3) special\n\n\
+         \Select one of 1/2/3: "
+    hFlush stdout -- ^ Flush the output buffer to ensure prompt is displayed immediately
+
     diff <- getLine
 
     fileName <- case diff of
@@ -235,38 +275,44 @@ sudokuMain = do
         "1" -> do getEasyPuzzle where -- ^ Start the recursive prompt
             getEasyPuzzle = do
                 putStr "Choose a puzzle number between 1 and 50: "
+                hFlush stdout
+
                 puzzleNum <- getLine
                 -- ^ Check if input is a valid number in range
                 case reads puzzleNum :: [(Int, String)] of
                     [(num, "")] | num >= 1 && num <= 50 -> 
                         return ("easy" ++ puzzleNum)
                     _ -> do
-                        putStrLn "Invalid choice. Please enter a number between 1 and 50."
+                        putStrLn $ "Sorry, " ++ show puzzleNum ++ " is an invalid choice. Please enter a number between 1 and 50."
                         getEasyPuzzle -- ^ Try again
 
         -- | Hard puzzle case
         "2" -> do getHardPuzzle where -- ^ Start the recursive prompt
             getHardPuzzle = do
                     putStr "Choose a puzzle number between 1 and 95: "
+                    hFlush stdout
+
                     puzzleNum <- getLine
                     -- ^ Check if input is a valid number in range
                     case reads puzzleNum :: [(Int, String)] of
                         [(num, "")] | num >= 1 && num <= 95 -> 
                             return ("hard" ++ puzzleNum)
                         _ -> do
-                            putStrLn "Invalid choice. Please enter a number between 1 and 95."
+                            putStrLn $ "Sorry, " ++ show puzzleNum ++ " is an invalid choice. Please enter a number between 1 and 95."
                             getHardPuzzle -- ^ Try again
         
         -- | Special puzzle case
         "3" -> do askForSpecialPuzzle where -- ^ Start the recursive prompt
             askForSpecialPuzzle = do
                 putStr "Choose a puzzle: \n\
-                    \  (1) impossible\n\
+                    \  (1) Impossible\n\
                     \  (2) Mirror\n\
-                    \  (3) Times1\n"
+                    \  (3) Times1\n\n\
+                    \Select one of (1, 2, 3): "
+                hFlush stdout
                 
-                putStr "\nSelect one of (1, 2, 3): "
                 puzzleName <- getLine
+
                 case puzzleName of
                     "1" -> return "impossible"
                     "2" -> return "Mirror"
@@ -493,25 +539,26 @@ domainReductionExperimentHard = do
     print oldAvgDomains
     print newAvgDomains
 
-domainCombinationsExperiment :: String -> IO ()
+domainCombinationsExperiment :: String -> IO (String, String)
 domainCombinationsExperiment fileName = do
     (_, _, oldDomains, newDomains) <- runAC3OnSudokuFileSilent fileName
     
-    putStrLn "Old domains number of combinations:"
-    printNumberofCombinations oldDomains
-    putStrLn "New domains number of combinations:"
-    printNumberofCombinations newDomains
+    let oldCombinations = numberofCombinations oldDomains
+    let newCombinations = numberofCombinations newDomains
+
+    return (oldCombinations, newCombinations)
+
     where
-        printNumberofCombinations domains' = do
-            let a = map length domains'
-            let logProduct = sum $ map (logBase 10 . fromIntegral) a :: Float
-            let flooredValue = floor logProduct :: Int
-            putStrLn $ "Total combinations: approximately 10^" ++ show flooredValue
+        numberofCombinations :: [[Int]] -> String
+        numberofCombinations domains' = "10^" ++ show flooredValue where
+            a = map length domains'
+            logProduct = sum $ map (logBase 10 . fromIntegral) a :: Float
+            flooredValue = floor logProduct :: Int
 
 runDomainCombinationsExperiment :: IO ()
 runDomainCombinationsExperiment = do
-    mapM_ domainCombinationsExperiment easyFiles
-    -- mapM_ domainCombinationsExperiment hardFiles
+    results <- mapM domainCombinationsExperiment hardFiles
+    print results
 
 \end{code}
 
